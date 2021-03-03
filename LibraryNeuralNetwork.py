@@ -1,3 +1,5 @@
+# TODO: evaluate() of NeuralNetwork
+
 from random import uniform
 
 # Constant variables
