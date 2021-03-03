@@ -25,6 +25,7 @@ class Neuron():
 			self.activated = True
 	def populate(self, pop):
 		print(pop)
+		self.weights = []
 		for i in range(pop):
 			self.weights.append(uniform(-10, 10))
 # Layer class
@@ -106,15 +107,6 @@ class NeuralNetwork():
 # l = Layer(size=3)
 # print(str(l))
 
-# nn = NeuralNetwork(size=[1, 3, 5, 2])
-# print(str(nn))
-# print(repr(nn))
-
-n1 = Neuron()
-n2 = Neuron()
-n1.populate(1)
-n1.evaluate([1])
-print(n1.weights)
-print(n2.weights)
-print(n1.activated)
-print(n2.activated)
+nn = NeuralNetwork(size=[1, 3, 5, 2])
+print(str(nn))
+print(repr(nn))
