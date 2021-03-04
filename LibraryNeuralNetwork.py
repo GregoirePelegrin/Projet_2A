@@ -1,8 +1,11 @@
 from random import uniform
+import math
 
 # Activation function
 def relu(x):
 	return max(0, x)
+def sigmoid(x):
+	return 1/(1+math.exp(-x))
 
 # Neuron class
 class Neuron():
@@ -17,11 +20,11 @@ class Neuron():
 		temp = 0
 		for i,w in zip(inputs, self.weights):
 			temp += w*i 								# n*True = n
-		self.value = relu(temp)
+		self.value = sigmoid(temp)
 	def populate(self, pop):
 		self.weights = []
 		for i in range(pop):
-			self.weights.append(uniform(-10, 10))
+			self.weights.append(uniform(-1, 1))
 # Layer class
 class Layer():
 	def __init__(self, size=0, weights=[]):

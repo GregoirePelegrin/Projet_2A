@@ -2,6 +2,11 @@ import pygame
 import math
 import time
 
+import LibraryNeuralNetwork as lnn
+
+THRESHOLD = 0.6
+nn = lnn.NeuralNetwork(size=[2, 5, 5, 4])
+
 pygame.init()
 gameDisplay = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Racing")
@@ -59,6 +64,7 @@ while(gameIsOn):
     if(keys[pygame.K_UP]):
         acceleration += 1
         actions.append("UP")
+
     if(keys[pygame.K_DOWN]):
         acceleration -= 0.5
         actions.append("DOWN")
@@ -88,9 +94,9 @@ while(gameIsOn):
     lineSurface = lineSurface.convert_alpha()
     dx = math.cos((orientation-90) * math.pi / 180)
     dy = math.sin((orientation-90) * math.pi / 180)
+    dist = 50
     if(int(x+dx*50) >= 0 and int(x+dx*50) < 800 and int(y+dy*50) >= 0 and int(y+dy*50) < 600):
         if(bg.get_at((int(x+dx*50),int(y+dy*50))) == (181, 230, 29, 255)):
-            dist = 50
             while(bg.get_at((int(x+dx*dist),int(y+dy*dist))) == (181, 230, 29, 255)):
                 dist-=1
                 if(dist==0):
@@ -100,7 +106,6 @@ while(gameIsOn):
         else : 
             pygame.draw.line(lineSurface, (0,255,0),(x,y),(x+dx*50,y+dy*50))
             environnement[0] = -1
-    print(environnement)
 
     x += dx*acceleration
     y += dy*acceleration
@@ -113,4 +118,28 @@ while(gameIsOn):
     gameDisplay.blit(lineSurface, (0,0))
     pygame.display.update()
     #pygame.display.flip()
+    listInput = nn.evaluate([acceleration, dist])
+
+    if(listInput[0] >= THRESHOLD):
+        #carImg = pygame.transform.rotate(carImg, -10)
+        orientation -= 5
+        actions.append("LEFT")
+
+    if(listInput[1] >= THRESHOLD):
+        #carImg = pygame.transform.rotate(carImg, 10)
+        orientation += 5
+        actions.append("RIGHT")
+
+    if(listInput[2] >= THRESHOLD):
+        acceleration += 1
+        actions.append("UP")
+
+    if(listInput[3] >= THRESHOLD):
+        acceleration -= 0.5
+        actions.append("DOWN")
+
+    print(listInput)
+
     clock.tick(30)
+
+    
