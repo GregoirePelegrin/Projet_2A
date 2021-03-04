@@ -1,4 +1,4 @@
-impôrt LibraryNeuralNetwork.py as lnn
+import LibraryNeuralNetwork.py as lnn
 
 class Car():
     def __init__(self):
