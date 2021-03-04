@@ -46,7 +46,7 @@ timeRace = time.time()
 possibleActions = ["UP", "DOWN", "RIGHT", "LEFT"]
 environnement = [-1]
 actions = []
-
+c=0
 lastPixel = bg.get_at((int(x),int(y)))
 
 while(gameIsOn):
@@ -76,8 +76,42 @@ while(gameIsOn):
     if(keys[pygame.K_DOWN]):
         acceleration -= 0.5
         actions.append("DOWN")
+
+    if(acceleration > 0):
+        acceleration -= min(0.5, acceleration)
     
+    if(x >= 0 and x < 800 and y >= 0 and y < 600):
+        if(bg.get_at((int(x),int(y))) == (181, 230, 29, 255)):
+            if(lastPixel != bg.get_at((int(x),int(y)))):
+                acceleration/=3
+                alive = False
+            acceleration -= min(0.45, acceleration)
+        if(bg.get_at((int(x),int(y))) == (0,0,255) and nextCheckpoint == 1):
+            print("Finish ! - time = " + str(time.time()-timeRace))
+            nextCheckpoint=2
+            print(actions)
+            actions = []
+        if(bg.get_at((int(x),int(y))) == (0,0,254) and nextCheckpoint == 2):
+            print("Checkpoint ! - time = " + str(time.time()-timeRace))
+            nextCheckpoint=1
+        lastPixel = bg.get_at((int(x),int(y)))
+            
     gameDisplay.blit(bg, (0,0))
+    orientedCarImg = pygame.transform.rotate(carImg, -orientation)
+    new_rect = orientedCarImg.get_rect(center = (x,y))
+
+    lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
+    lineSurface = lineSurface.convert_alpha()
+    dx = math.cos((orientation-90) * math.pi / 180)
+    dy = math.sin((orientation-90) * math.pi / 180)
+    x += dx*acceleration
+    y += dy*acceleration
+    if(x < 0 or x >= 800 or y < 0 or y >= 600):
+        x -= dx*acceleration
+        y -= dy*acceleration
+    gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
+    gameDisplay.blit(lineSurface, (0,0))
+    
     for car in cars:
         if(car.alive):
             if(car.acceleration > 0):
@@ -101,6 +135,7 @@ while(gameIsOn):
             
             car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
             new_rect = car.orientedCarImg.get_rect(center = (car.x,car.y))
+
 
             lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
             lineSurface = lineSurface.convert_alpha()
@@ -129,28 +164,23 @@ while(gameIsOn):
             gameDisplay.blit(lineSurface, (0,0))
             #pygame.display.flip()
             listInput = car.nn.evaluate([acceleration, dist])
-            print("-------------------------" + str(car.id))
             if(listInput[0] >= THRESHOLD):
                 #carImg = pygame.transform.rotate(carImg, -10)
                 car.orientation -= 5
                 actions.append("LEFT")
-                print("LEFT")
 
             if(listInput[1] >= THRESHOLD):
                 #carImg = pygame.transform.rotate(carImg, 10)
                 car.orientation += 5
                 actions.append("RIGHT")
-                print("RIGHT")
 
             if(listInput[2] >= THRESHOLD):
                 car.acceleration += 1
                 actions.append("UP")
-                print("UP")
 
             if(listInput[3] >= THRESHOLD):
                 car.acceleration -= 0.5
                 actions.append("DOWN")
-                print("DOWN")
 
     pygame.display.update()
     clock.tick(30)
