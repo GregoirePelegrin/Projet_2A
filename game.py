@@ -138,8 +138,6 @@ while(gameIsOn):
         acceleration -= 0.5
         actions.append("DOWN")
 
-    print(listInput)
-
     clock.tick(30)
 
     
