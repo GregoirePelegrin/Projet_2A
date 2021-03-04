@@ -1,7 +1,7 @@
 from random import uniform
 import math
 
-# Activation function
+# Activation functions
 def relu(x):
 	return max(0, x)
 def sigmoid(x):
