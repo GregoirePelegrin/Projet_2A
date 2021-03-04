@@ -1,9 +1,4 @@
-# TODO: evaluate() of NeuralNetwork
-
 from random import uniform
-
-# Constant variables
-THRESHOLD = 0
 
 # Activation function
 def relu(x):
@@ -12,21 +7,18 @@ def relu(x):
 # Neuron class
 class Neuron():
 	def __init__(self, weigths=[]):
-		self.activated = False
+		self.value = 0
 		self.weights = weigths							# These are the input weights for this neuron
 	def __str__(self):
-		return "Neuron({})".format(self.activated)
+		return "Neuron({})".format(self.value)
 	def __repr__(self):
 		return "{}".format(self.weights)
 	def evaluate(self, inputs):
 		temp = 0
 		for i,w in zip(inputs, self.weights):
 			temp += w*i 								# n*True = n
-		score = relu(temp)
-		if score > THRESHOLD:
-			self.activated = True
+		self.value = relu(temp)
 	def populate(self, pop):
-		print(pop)
 		self.weights = []
 		for i in range(pop):
 			self.weights.append(uniform(-10, 10))
@@ -51,20 +43,23 @@ class Layer():
 	def __str__(self):
 		temp = []
 		for n in self.neurons:
-			temp.append(n.activated)
+			temp.append(n.value)
 		return "Layer({})".format(temp)
 	def __repr__(self):
 		temp = ""
 		for n in self.neurons:
 			temp += n.__repr__() + "\n"
 		return temp
+	def assign(self, values):
+		for n,v in zip(self.neurons, values):
+			n.value = v
 	def evaluate(self, inputs):
 		for n in self.neurons:
 			n.evaluate(inputs)
 	def getState(self):
 		temp = []
 		for n in self.neurons:
-			temp.append(n.activated)
+			temp.append(n.value)
 		return temp
 	def populate(self, pop):
 		for n in self.neurons:
@@ -101,14 +96,8 @@ class NeuralNetwork():
 		for l in self.layers:
 			temp += l.__repr__() + "\n"
 		return temp
-
-
-# n = Neuron()
-# print(str(n))
-
-# l = Layer(size=3)
-# print(str(l))
-
-nn = NeuralNetwork(size=[1, 3, 5, 2])
-print(str(nn))
-print(repr(nn))
+	def evaluate(self, inputs):
+		self.layers[0].assign(inputs)
+		for i in range(1, len(self.layers)):
+			self.layers[i].evaluate(self.layers[i-1].getState())
+		return self.layers[-1].getState()
