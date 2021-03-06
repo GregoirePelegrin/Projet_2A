@@ -1,7 +1,7 @@
 from random import randint
 from random import uniform
 
-import LibraryGame as lg
+import Libraries.LibraryGame as lg
 
 # Constants
 PROBABILITY_CROSSOVER = 10

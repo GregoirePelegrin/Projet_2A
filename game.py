@@ -2,8 +2,8 @@ import pygame
 import math
 import time
 
-import LibraryNeuralNetwork as lnn
-import libraryGame as lg
+import Libraries.LibraryGame as lg
+import Libraries.LibraryNeuralNetwork as lnn
 
 carImg = pygame.image.load("imgs/car.png")
 orientedCarImg = pygame.transform.rotate(carImg, 90)
