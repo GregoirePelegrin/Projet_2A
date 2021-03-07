@@ -1,7 +1,7 @@
 import Libraries.LibraryNeuralNetwork as lnn
 
 class Car():
-    def __init__(self, id):
+    def __init__(self, id="Dummy"):
         self.id = id
         self.alive = True
         self.acceleration = 0
@@ -13,3 +13,5 @@ class Car():
         self.nextCheckpoint = 2
         self.orientedCarImg = None
         self.checkpointPassedCounter = 0
+    def __str__(self):
+        return "Car({})".format(self.id)
