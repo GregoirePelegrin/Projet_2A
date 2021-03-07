@@ -20,8 +20,8 @@ class GeneticAlgorithm():
 			self.NUMBER_INDIVIDUALS, self.PROBABILITY_CROSSOVER, self.PROBABILITY_MUTATION)
 
 	def evolve(self, individuals):
-		individuals = individuals[:]
-		self.crossover(self.selection(individuals))
+		currentGen = individuals[:]
+		self.crossover(self.selection(currentGen))
 		self.mutate()
 		self.populate()
 		return self.nextGen
@@ -59,14 +59,14 @@ class GeneticAlgorithm():
 				self.nextGen.append(p2)
 	def fitness(self, individual):
 		return individual.totalDistance + self.COEFF_FITNESS*individual.checkpointPassedCounter
-	def mutate(self, ):
+	def mutate(self):
 		for individual in self.nextGen:
 			if randint(0, 100) < self.PROBABILITY_MUTATION:
 				lay = randint(1, len(individual.nn.layers)-1)
 				neu = randint(0, len(individual.nn.layers[lay].neurons)-1)
 				wei = randint(0, len(individual.nn.layers[lay].neurons[neu].weights)-1)
 				individual.nn.layers[lay].neurons[neu].weights[wei] += uniform(-0.005, 0.005)
-	def populate(self, ):
+	def populate(self):
 		for i in range(int(self.NUMBER_INDIVIDUALS / 10)):
 			self.nextGen.append(lg.Car)
 	def selection(self, individuals):

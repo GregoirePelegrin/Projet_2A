@@ -3,6 +3,7 @@ import math
 import time
 
 import Libraries.LibraryGame as lg
+import Libraries.LibraryGeneticAlgorithm as lga
 import Libraries.LibraryNeuralNetwork as lnn
 
 carImg = pygame.image.load("imgs/car.png")
@@ -17,6 +18,9 @@ for i in range(NB_CAR):
     car = lg.Car(i)
     car.orientedCarImg = pygame.transform.rotate(carImg, 90)
     cars.append(car)
+
+ga = lga.GeneticAlgorithm(ni=NB_CAR)
+ga.evolve(cars)
 
 pygame.init()
 gameDisplay = pygame.display.set_mode((800,600))
@@ -181,7 +185,6 @@ while(gameIsOn):
             if(listInput[3] >= THRESHOLD):
                 car.acceleration -= 0.5
                 actions.append("DOWN")
-
     pygame.display.update()
     clock.tick(30)
 
