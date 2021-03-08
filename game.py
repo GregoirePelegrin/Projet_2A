@@ -12,6 +12,8 @@ bg = pygame.image.load("imgs/screen.png")
 
 THRESHOLD = 0.55
 NB_CAR = 10
+NB_GENERATION = 10
+TIME_RACE = 2
 nn = lnn.NeuralNetwork(size=[2, 5, 5, 4])
 cars = []
 for i in range(NB_CAR):
@@ -33,10 +35,6 @@ gameIsOn = True
 
 x = 350
 y = 150
-accelerationH = 0
-accelerationV = 0
-currentV = 0
-currentH = 0
 orientation = 90
 acceleration = 0
 
@@ -53,71 +51,16 @@ actions = []
 c=0
 lastPixel = bg.get_at((int(x),int(y)))
 
-while(gameIsOn):
+for gen in range(NB_GENERATION):
+    print("gen " + str(gen))
+    timeCurrent = time.time()
+    while(time.time() - timeCurrent < TIME_RACE):
+        gameDisplay.blit(bg, (0,0))
+        print("a")
+        for car in cars:
+            if(not car.alive):
+                continue
 
-    for event in pygame.event.get():
-        if(event.type == pygame.QUIT):
-            gameIsOn = False
-            print("Game is off")
-        
-    keys = pygame.key.get_pressed()
-
-    new_rect = orientedCarImg.get_rect(center = (x,y))
-    if(keys[pygame.K_LEFT]):
-        #carImg = pygame.transform.rotate(carImg, -10)
-        orientation -= 5
-        actions.append("LEFT")
-
-    if(keys[pygame.K_RIGHT]):
-        #carImg = pygame.transform.rotate(carImg, 10)
-        orientation += 5
-        actions.append("RIGHT")
-
-    if(keys[pygame.K_UP]):
-        acceleration += 1
-        actions.append("UP")
-
-    if(keys[pygame.K_DOWN]):
-        acceleration -= 0.5
-        actions.append("DOWN")
-
-    if(acceleration > 0):
-        acceleration -= min(0.5, acceleration)
-    
-    if(x >= 0 and x < 800 and y >= 0 and y < 600):
-        if(bg.get_at((int(x),int(y))) == (181, 230, 29, 255)):
-            if(lastPixel != bg.get_at((int(x),int(y)))):
-                acceleration/=3
-                alive = False
-            acceleration -= min(0.45, acceleration)
-        if(bg.get_at((int(x),int(y))) == (0,0,255) and nextCheckpoint == 1):
-            print("Finish ! - time = " + str(time.time()-timeRace))
-            nextCheckpoint=2
-            print(actions)
-            actions = []
-        if(bg.get_at((int(x),int(y))) == (0,0,254) and nextCheckpoint == 2):
-            print("Checkpoint ! - time = " + str(time.time()-timeRace))
-            nextCheckpoint=1
-        lastPixel = bg.get_at((int(x),int(y)))
-            
-    gameDisplay.blit(bg, (0,0))
-    orientedCarImg = pygame.transform.rotate(carImg, -orientation)
-    new_rect = orientedCarImg.get_rect(center = (x,y))
-
-    lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
-    lineSurface = lineSurface.convert_alpha()
-    dx = math.cos((orientation-90) * math.pi / 180)
-    dy = math.sin((orientation-90) * math.pi / 180)
-    x += dx*acceleration
-    y += dy*acceleration
-    if(x < 0 or x >= 800 or y < 0 or y >= 600):
-        x -= dx*acceleration
-        y -= dy*acceleration
-    gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
-    gameDisplay.blit(lineSurface, (0,0))
-    
-    for car in cars:
-        if(car.alive):
             if(car.acceleration > 0):
                 car.acceleration -= min(0.5, car.acceleration)
             
@@ -169,12 +112,10 @@ while(gameIsOn):
             #pygame.display.flip()
             listInput = car.nn.evaluate([acceleration, dist])
             if(listInput[0] >= THRESHOLD):
-                #carImg = pygame.transform.rotate(carImg, -10)
                 car.orientation -= 5
                 actions.append("LEFT")
 
             if(listInput[1] >= THRESHOLD):
-                #carImg = pygame.transform.rotate(carImg, 10)
                 car.orientation += 5
                 actions.append("RIGHT")
 
@@ -184,8 +125,8 @@ while(gameIsOn):
 
             if(listInput[3] >= THRESHOLD):
                 car.acceleration -= 0.5
-                actions.append("DOWN")
-    pygame.display.update()
-    clock.tick(30)
+                actions.append("DOWN") 
+                
+        pygame.display.update()
+        clock.tick(30)
 
-    
