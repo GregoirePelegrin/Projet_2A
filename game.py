@@ -11,8 +11,8 @@ orientedCarImg = pygame.transform.rotate(carImg, 90)
 bg = pygame.image.load("imgs/screen.png")
 
 THRESHOLD = 0.55
-NB_CAR = 10
-NB_GENERATION = 10
+NB_CAR = 20
+NB_GENERATION = 15
 TIME_RACE = 2
 nn = lnn.NeuralNetwork(size=[2, 5, 5, 4])
 cars = []
@@ -22,7 +22,6 @@ for i in range(NB_CAR):
     cars.append(car)
 
 ga = lga.GeneticAlgorithm(ni=NB_CAR)
-ga.evolve(cars)
 
 pygame.init()
 gameDisplay = pygame.display.set_mode((800,600))
@@ -31,13 +30,10 @@ clock = pygame.time.Clock()
 
 gameIsOn = True
 
-
-
 x = 350
 y = 150
 orientation = 90
 acceleration = 0
-
 
 # CHECKPOINTS
 pygame.draw.rect(bg,(0,0,255), (310,130, 20,80))    # center (320,170)
@@ -91,6 +87,7 @@ for gen in range(NB_GENERATION):
                 else : 
                     pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx*50,car.y+dy*50))
 
+            car.totalDistance += car.acceleration
             car.x += dx*car.acceleration
             car.y += dy*car.acceleration
             if(car.x < 0 or car.x >= 800 or car.y < 0 or car.y >= 600):
@@ -103,19 +100,16 @@ for gen in range(NB_GENERATION):
             listInput = car.nn.evaluate([acceleration, dist])
             if(listInput[0] >= THRESHOLD):
                 car.orientation -= 5
-                actions.append("LEFT")
 
             if(listInput[1] >= THRESHOLD):
                 car.orientation += 5
-                actions.append("RIGHT")
 
             if(listInput[2] >= THRESHOLD):
                 car.acceleration += 1
-                actions.append("UP")
 
             if(listInput[3] >= THRESHOLD):
                 car.acceleration -= 0.5
-                actions.append("DOWN")
                 
         pygame.display.update()
         clock.tick(30)
+    ga.evolve(cars)
