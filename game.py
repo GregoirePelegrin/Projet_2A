@@ -45,18 +45,13 @@ pygame.draw.rect(bg,(0,0,254), (270,430, 20,80))    # center (280,470)
 nextCheckpoint = 2
 timeRace = time.time()
 
-possibleActions = ["UP", "DOWN", "RIGHT", "LEFT"]
-environnement = [-1]
-actions = []
-c=0
 lastPixel = bg.get_at((int(x),int(y)))
 
 for gen in range(NB_GENERATION):
-    print("gen " + str(gen))
+    print("Gen " + str(gen))
     timeCurrent = time.time()
     while(time.time() - timeCurrent < TIME_RACE):
         gameDisplay.blit(bg, (0,0))
-        print("a")
         for car in cars:
             if(not car.alive):
                 continue
@@ -73,8 +68,6 @@ for gen in range(NB_GENERATION):
                 if(bg.get_at((int(car.x),int(car.y))) == (0,0,255) and car.nextCheckpoint == 1):
                     print("Finish ! - time = " + str(time.time()-timeRace))
                     car.nextCheckpoint=2
-                    print(actions)
-                    actions = []
                 if(bg.get_at((int(car.x),int(car.y))) == (0,0,254) and car.nextCheckpoint == 2):
                     print("Checkpoint ! - time = " + str(time.time()-timeRace))
                     car.nextCheckpoint=1
@@ -82,7 +75,6 @@ for gen in range(NB_GENERATION):
             
             car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
             new_rect = car.orientedCarImg.get_rect(center = (car.x,car.y))
-
 
             lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
             lineSurface = lineSurface.convert_alpha()
@@ -96,10 +88,8 @@ for gen in range(NB_GENERATION):
                         if(dist==50):
                             break
                     pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx*50,car.y+dy*50))
-                    environnement[0] = dist
                 else : 
                     pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx*50,car.y+dy*50))
-                    environnement[0] = -1
 
             car.x += dx*car.acceleration
             car.y += dy*car.acceleration
@@ -109,7 +99,7 @@ for gen in range(NB_GENERATION):
 
             gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
             gameDisplay.blit(lineSurface, (0,0))
-            #pygame.display.flip()
+
             listInput = car.nn.evaluate([acceleration, dist])
             if(listInput[0] >= THRESHOLD):
                 car.orientation -= 5
@@ -125,8 +115,7 @@ for gen in range(NB_GENERATION):
 
             if(listInput[3] >= THRESHOLD):
                 car.acceleration -= 0.5
-                actions.append("DOWN") 
+                actions.append("DOWN")
                 
         pygame.display.update()
         clock.tick(30)
-
