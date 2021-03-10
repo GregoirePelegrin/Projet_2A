@@ -48,11 +48,12 @@ lastPixel = bg.get_at((int(x),int(y)))
 for gen in range(NB_GENERATION):
     print("Gen " + str(gen))
     timeCurrent = time.time()
+
     while(time.time() - timeCurrent < TIME_RACE):
         for event in pygame.event.get():
             if(event.type == pygame.QUIT):
                 pygame.quit()
-        
+
         gameDisplay.blit(bg, (0,0))
         for car in cars:
             if(not car.alive):
