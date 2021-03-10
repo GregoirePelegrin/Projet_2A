@@ -20,6 +20,7 @@ class GeneticAlgorithm():
 			self.NUMBER_INDIVIDUALS, self.PROBABILITY_CROSSOVER, self.PROBABILITY_MUTATION)
 
 	def evolve(self, individuals):
+		self.nextGen = []
 		currentGen = individuals[:]
 		self.crossover(self.selection(currentGen))
 		self.mutate()
@@ -68,7 +69,7 @@ class GeneticAlgorithm():
 				individual.nn.layers[lay].neurons[neu].weights[wei] += uniform(-0.005, 0.005)
 	def populate(self):
 		for i in range(int(self.NUMBER_INDIVIDUALS / 10)):
-			self.nextGen.append(lg.Car)
+			self.nextGen.append(lg.Car())
 	def selection(self, individuals):
 		currentGen = individuals[:]
 		sortedList = []
