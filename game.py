@@ -6,14 +6,16 @@ import Libraries.LibraryGame as lg
 import Libraries.LibraryGeneticAlgorithm as lga
 import Libraries.LibraryNeuralNetwork as lnn
 
+import Libraries.ga as ga
+
 carImg = pygame.image.load("imgs/car.png")
 orientedCarImg = pygame.transform.rotate(carImg, 90)
 bg = pygame.image.load("imgs/screen.png")
 
 THRESHOLD = 0.55
-NB_CAR = 20
-NB_GENERATION = 15
-TIME_RACE = 2
+NB_CAR = 10
+NB_GENERATION = 30
+TIME_RACE = 1
 nn = lnn.NeuralNetwork(size=[2, 5, 5, 4])
 cars = []
 for i in range(NB_CAR):
@@ -21,7 +23,7 @@ for i in range(NB_CAR):
     car.orientedCarImg = pygame.transform.rotate(carImg, 90)
     cars.append(car)
 
-ga = lga.GeneticAlgorithm(ni=NB_CAR)
+# ga = lga.GeneticAlgorithm(ni=NB_CAR)
 
 pygame.init()
 gameDisplay = pygame.display.set_mode((800,600))
@@ -116,4 +118,8 @@ for gen in range(NB_GENERATION):
                 
         pygame.display.update()
         clock.tick(30)
-    ga.evolve(cars)
+    
+    for car in cars :
+        print(str(car.alive) + " : " + str(car.totalDistance))
+    print("----------")
+    cars = ga.step(cars, NB_CAR)
