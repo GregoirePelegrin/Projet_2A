@@ -9,9 +9,9 @@ def sigmoid(x):
 
 # Neuron class
 class Neuron():
-	def __init__(self, weigths=[]):
+	def __init__(self, weights=[]):
 		self.value = 0
-		self.weights = weigths							# These are the input weights for this neuron
+		self.weights = weights							# These are the input weights for this neuron
 	def __str__(self):
 		return "Neuron({})".format(self.value)
 	def __repr__(self):
@@ -42,7 +42,7 @@ class Layer():
 			self.size = len(weights)
 			self.neurons = []
 			for w in weights:
-				self.neurons.append(Neuron(w))
+				self.neurons.append(Neuron(weights=w))
 	def __str__(self):
 		temp = []
 		for n in self.neurons:
@@ -53,6 +53,7 @@ class Layer():
 		for n in self.neurons:
 			temp += n.__repr__() + "\n"
 		return temp
+
 	def assign(self, values):
 		for n,v in zip(self.neurons, values):
 			n.value = v
@@ -75,6 +76,7 @@ class NeuralNetwork():
 		if len(size) == 0 and len(weights) == 0:
 			print("Error, please input a pair of size OR an array of weights")
 			return None
+		self.fitness = 0
 		self.layers = []
 		self.size = []
 		if len(size) != 0:
@@ -86,7 +88,7 @@ class NeuralNetwork():
 		else:
 			self.size = len(weights)
 			for i,w in enumerate(weights):
-				self.layers.append(Layer(w))
+				self.layers.append(Layer(weights=w))
 				if i != 0:
 					self.layers[i].populate(len(weights[i-1]))
 	def __str__(self):
@@ -99,6 +101,7 @@ class NeuralNetwork():
 		for l in self.layers:
 			temp += l.__repr__() + "\n"
 		return temp
+
 	def evaluate(self, inputs):
 		self.layers[0].assign(inputs)
 		for i in range(1, len(self.layers)):

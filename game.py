@@ -1,12 +1,12 @@
-import pygame
 import math
+import matplotlib.pyplot as plt
+import pygame
 import time
 
 import Libraries.LibraryGame as lg
-import Libraries.LibraryGeneticAlgorithm as lga
+import Libraries.LibraryGeneticAlgorithm2 as lga
 import Libraries.LibraryNeuralNetwork as lnn
 
-import Libraries.ga as ga
 
 carImg = pygame.image.load("imgs/car.png")
 orientedCarImg = pygame.transform.rotate(carImg, 90)
@@ -16,14 +16,15 @@ THRESHOLD = 0.55
 NB_CAR = 10
 NB_GENERATION = 30
 TIME_RACE = 1
-nn = lnn.NeuralNetwork(size=[2, 5, 5, 4])
+
+ga = lga.GeneticAlgorithm(ni=NB_CAR)
+
 cars = []
 for i in range(NB_CAR):
     car = lg.Car(i)
     car.orientedCarImg = pygame.transform.rotate(carImg, 90)
     cars.append(car)
 
-# ga = lga.GeneticAlgorithm(ni=NB_CAR)
 
 pygame.init()
 gameDisplay = pygame.display.set_mode((800,600))
@@ -44,6 +45,8 @@ nextCheckpoint = 2
 timeRace = time.time()
 
 lastPixel = bg.get_at((int(x),int(y)))
+
+bests, means = [], []
 
 for gen in range(NB_GENERATION):
     print("Gen " + str(gen))
@@ -116,11 +119,19 @@ for gen in range(NB_GENERATION):
 
             if(listInput[3] >= THRESHOLD):
                 car.acceleration -= 0.5
-                
+
         pygame.display.update()
         clock.tick(30)
-    
-    for car in cars :
-        print(str(car.alive) + " : " + str(car.totalDistance))
-    print("----------")
-    cars = ga.step(cars, NB_CAR)
+
+    ga.fitness(cars)
+    temp_results = ga.evaluate(cars)
+    bests.append(temp_results[0])
+    means.append(temp_results[1])
+    ga.evolve(cars)
+
+X = [x for x in range(NB_GENERATION)]
+plt.plot(X, bests, label="Bests")
+plt.plot(X, means, label="Means")
+plt.legend()
+plt.grid()
+plt.show()

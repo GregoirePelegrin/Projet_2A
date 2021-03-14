@@ -19,6 +19,16 @@ class GeneticAlgorithm():
 		return "GeneticAlgorithm(cf={}, ni={}, pc={}, pm={})".format(self.COEFF_FITNESS, 
 			self.NUMBER_INDIVIDUALS, self.PROBABILITY_CROSSOVER, self.PROBABILITY_MUTATION)
 
+	def evaluate(self, individuals):
+		best, mean = self.fitness(individuals[0]), 0
+		for individual in individuals:
+			temp = self.fitness(individual)
+			if temp > best:
+				best = temp
+			mean += temp
+		mean /= len(individuals)
+		return best, mean
+
 	def evolve(self, individuals):
 		self.nextGen = []
 		currentGen = individuals[:]
