@@ -45,8 +45,7 @@ class GeneticAlgorithm():
 		self.nextGen.clear()
 		self.nextGen.append(lnn.NeuralNetwork(neural=self.rankingNeural[0]))
 		# Next gen generation
-		self.crossing(self.selection())
-		self.mutate()
+		self.mutate(self.crossing(self.selection()))
 		self.populate()
 		# Next gen attribution + Reinitialisation of cars
 		for individual, neural in zip(individuals, self.nextGen):
@@ -59,6 +58,7 @@ class GeneticAlgorithm():
 
 	def crossing(self, individuals):
 		toCross = individuals[:]
+		temp_crossing = []
 		while len(toCross) > 0:
 			temp_indPar1 = randint(0, len(toCross)-1)
 			temp_indPar2 = randint(0, len(toCross)-1)
@@ -71,8 +71,8 @@ class GeneticAlgorithm():
 				toCross[temp_indPar1].layers[temp_indLay] = toCross[temp_indPar2].layers[temp_indLay]
 				toCross[temp_indPar2].layers[temp_indLay] = temp_lay
 			else:
-				self.nextGen.append(toCross[temp_indPar1])
-				self.nextGen.append(toCross[temp_indPar2])
+				temp_crossing.append(toCross[temp_indPar1])
+				temp_crossing.append(toCross[temp_indPar2])
 
 			if len(toCross)%2 != 0:
 				del toCross[temp_indPar1]
@@ -83,14 +83,15 @@ class GeneticAlgorithm():
 				else:
 					del toCross[temp_indPar1]
 					del toCross[temp_indPar2]
-	def mutate(self):
-		for neural in self.nextGen:
+		return temp_crossing
+	def mutate(self, individuals):
+		for neural in individuals:
 			if randint(0, 100) < self.PROBABILITY_MUTATION:
 				temp_indLay = randint(1, len(neural.layers)-1)
 				temp_indNeu = randint(1, len(neural.layers[temp_indLay].neurons)-1)
 				temp_indWei = randint(1, len(neural.layers[temp_indLay].neurons[temp_indNeu].weights)-1)
 				neural.layers[temp_indLay].neurons[temp_indNeu].weights[temp_indWei] = uniform(-1, 1)
-		return None
+			self.nextGen.append(neural)
 	def populate(self):
 		while len(self.nextGen) < self.NUMBER_INDIVIDUALS:
 			self.nextGen.append(lnn.NeuralNetwork(size=[4,16,32,16,4]))

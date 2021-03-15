@@ -12,7 +12,7 @@ orientedCarImg = pygame.transform.rotate(carImg, 90)
 bg = pygame.image.load("imgs/screen.png")
 
 THRESHOLD = 0.55
-NB_CAR = 200
+NB_CAR = 20
 NB_GENERATION = 30
 TIME_RACE = 200
 
@@ -173,7 +173,7 @@ for gen in range(NB_GENERATION):
     temp_results = ga.evaluate(cars)
     bests.append(temp_results[0])
     means.append(temp_results[1])
-    file.write("Generation {}\n{}".format(gen, temp_results[2]))
+    file.write("Gen {}\n{}".format(gen, temp_results[2]))
     counters.append(temp_results[3])
     nbrIndiv.append(len(cars))
     # </Display only>
