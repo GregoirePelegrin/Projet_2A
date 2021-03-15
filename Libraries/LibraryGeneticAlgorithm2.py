@@ -93,7 +93,7 @@ class GeneticAlgorithm():
 		return None
 	def populate(self):
 		while len(self.nextGen) < self.NUMBER_INDIVIDUALS:
-			self.nextGen.append(lnn.NeuralNetwork(size=[2,5,5,4]))
+			self.nextGen.append(lnn.NeuralNetwork(size=[4,16,32,16,4]))
 	def selection(self):
 		temp_selec = []
 		for i in range(1,int(8*self.NUMBER_INDIVIDUALS/10)):
