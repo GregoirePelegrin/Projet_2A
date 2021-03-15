@@ -46,7 +46,7 @@ timeRace = time.time()
 
 lastPixel = bg.get_at((int(x),int(y)))
 
-bests, means = [], []
+bests, means, nbrIndiv = [], [], []
 
 for gen in range(NB_GENERATION):
     print("Gen " + str(gen))
@@ -123,15 +123,24 @@ for gen in range(NB_GENERATION):
         pygame.display.update()
         clock.tick(30)
 
+    # Mandatory (before evolve)
     ga.fitness(cars)
+    # <Display only>
     temp_results = ga.evaluate(cars)
     bests.append(temp_results[0])
     means.append(temp_results[1])
+    nbrIndiv.append(len(cars))
+    # </Display only>
     ga.evolve(cars)
 
 X = [x for x in range(NB_GENERATION)]
-plt.plot(X, bests, label="Bests")
-plt.plot(X, means, label="Means")
-plt.legend()
-plt.grid()
+ax1 = plt.subplot(211)
+ax1.plot(X, bests, label="Bests")
+ax1.plot(X, means, label="Means")
+ax1.legend()
+ax1.grid()
+ax1.set_title("Performances")
+ax2 = plt.subplot(2,3,(5,6))
+ax2.plot(X, nbrIndiv)
+ax2.set_title("Nbr of individuals")
 plt.show()

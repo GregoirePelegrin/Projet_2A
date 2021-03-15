@@ -39,6 +39,7 @@ class GeneticAlgorithm():
 		return best, mean
 	def evolve(self, individuals):
 		self.nextGen.clear()
+		self.nextGen.append(self.rankingNeural[0])
 		# Next gen generation
 		self.crossing(self.selection())
 		self.mutate()
@@ -53,15 +54,44 @@ class GeneticAlgorithm():
 			individual.nn.fitness = individual.totalDistance + self.COEFF_FITNESS*individual.checkpointPassedCounter
 
 	def crossing(self, individuals):
-		for individual in individuals:
-			self.nextGen.append(individual)
+		toCross = individuals[:]
+		while len(toCross) > 0:
+			temp_indPar1 = randint(0, len(toCross)-1)
+			temp_indPar2 = randint(0, len(toCross)-1)
+			while temp_indPar1 == temp_indPar2:
+				temp_indPar2 = randint(0, len(toCross)-1)
+
+			if randint(0, 100) < self.PROBABILITY_CROSSOVER:
+				temp_indLay = randint(1, len(toCross[temp_indPar1].layers)-1)
+				temp_lay = toCross[temp_indPar1].layers[temp_indLay]
+				toCross[temp_indPar1].layers[temp_indLay] = toCross[temp_indPar2].layers[temp_indLay]
+				toCross[temp_indPar2].layers[temp_indLay] = temp_lay
+			else:
+				self.nextGen.append(toCross[temp_indPar1])
+				self.nextGen.append(toCross[temp_indPar2])
+
+			if len(toCross)%2 != 0:
+				del toCross[temp_indPar1]
+			else:
+				if temp_indPar1 < temp_indPar2:
+					del toCross[temp_indPar2]
+					del toCross[temp_indPar1]
+				else:
+					del toCross[temp_indPar1]
+					del toCross[temp_indPar2]
 	def mutate(self):
+		for neural in self.nextGen:
+			if randint(0, 100) < self.PROBABILITY_MUTATION:
+				temp_indLay = randint(1, len(neural.layers)-1)
+				temp_indNeu = randint(1, len(neural.layers[temp_indLay].neurons)-1)
+				temp_indWei = randint(1, len(neural.layers[temp_indLay].neurons[temp_indNeu].weights)-1)
+				neural.layers[temp_indLay].neurons[temp_indNeu].weights[temp_indWei] = uniform(-1, 1)
 		return None
 	def populate(self):
 		while len(self.nextGen) < self.NUMBER_INDIVIDUALS:
 			self.nextGen.append(lnn.NeuralNetwork(size=[2,5,5,4]))
 	def selection(self):
 		temp_selec = []
-		for i in range(int(8*self.NUMBER_INDIVIDUALS/10)):
+		for i in range(int(8*self.NUMBER_INDIVIDUALS/10)-1):
 			temp_selec.append(self.rankingNeural[i])
 		return temp_selec
