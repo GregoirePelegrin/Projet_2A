@@ -35,11 +35,15 @@ class GeneticAlgorithm():
 			self.rankingNeural.insert(index, individual.nn)
 			mean += temp
 		best = self.rankingNeural[0].fitness
+		counter = 0
+		for individual in individuals:
+			if individual.nn.fitness == best:
+				counter += 1
 		mean /= len(individuals)
-		return best, mean
+		return best, mean, self.rankingNeural[0], counter
 	def evolve(self, individuals):
 		self.nextGen.clear()
-		self.nextGen.append(self.rankingNeural[0])
+		self.nextGen.append(lnn.NeuralNetwork(neural=self.rankingNeural[0]))
 		# Next gen generation
 		self.crossing(self.selection())
 		self.mutate()
@@ -92,6 +96,6 @@ class GeneticAlgorithm():
 			self.nextGen.append(lnn.NeuralNetwork(size=[2,5,5,4]))
 	def selection(self):
 		temp_selec = []
-		for i in range(int(8*self.NUMBER_INDIVIDUALS/10)-1):
+		for i in range(1,int(8*self.NUMBER_INDIVIDUALS/10)):
 			temp_selec.append(self.rankingNeural[i])
 		return temp_selec

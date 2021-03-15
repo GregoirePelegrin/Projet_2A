@@ -13,7 +13,7 @@ orientedCarImg = pygame.transform.rotate(carImg, 90)
 bg = pygame.image.load("imgs/screen.png")
 
 THRESHOLD = 0.55
-NB_CAR = 10
+NB_CAR = 30
 NB_GENERATION = 30
 TIME_RACE = 1
 
@@ -46,13 +46,15 @@ timeRace = time.time()
 
 lastPixel = bg.get_at((int(x),int(y)))
 
-bests, means, nbrIndiv = [], [], []
+bests, means, nbrIndiv, counters = [], [], [], []
+file = open("Test.txt", "w")
 
 for gen in range(NB_GENERATION):
     print("Gen " + str(gen))
     timeCurrent = time.time()
 
-    while(time.time() - timeCurrent < TIME_RACE):
+    endGame = 0
+    while endGame < 30:
         for event in pygame.event.get():
             if(event.type == pygame.QUIT):
                 pygame.quit()
@@ -122,6 +124,7 @@ for gen in range(NB_GENERATION):
 
         pygame.display.update()
         clock.tick(30)
+        endGame += 1
 
     # Mandatory (before evolve)
     ga.fitness(cars)
@@ -129,6 +132,8 @@ for gen in range(NB_GENERATION):
     temp_results = ga.evaluate(cars)
     bests.append(temp_results[0])
     means.append(temp_results[1])
+    file.write("Generation {}\n{}".format(gen, temp_results[2]))
+    counters.append(temp_results[3])
     nbrIndiv.append(len(cars))
     # </Display only>
     ga.evolve(cars)
@@ -140,7 +145,11 @@ ax1.plot(X, means, label="Means")
 ax1.legend()
 ax1.grid()
 ax1.set_title("Performances")
-ax2 = plt.subplot(224)
-ax2.plot(X, nbrIndiv)
-ax2.set_title("Nbr of individuals")
+ax2 = plt.subplot(223)
+ax2.plot(X, counters)
+ax2.set_title("Nbr of best individuals")
+ax2.grid()
+ax3 = plt.subplot(224)
+ax3.plot(X, nbrIndiv)
+ax3.set_title("Nbr of individuals")
 plt.show()
