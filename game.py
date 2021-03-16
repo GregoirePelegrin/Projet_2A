@@ -7,16 +7,21 @@ import Libraries.LibraryGame as lg
 import Libraries.LibraryGeneticAlgorithm2 as lga
 import Libraries.LibraryNeuralNetwork as lnn
 
-carImg = pygame.image.load("imgs/car.png")
+pygame.init()
+gameDisplay = pygame.display.set_mode((800,600))
+
+carImg = pygame.image.load("imgs/car.png").convert_alpha()
 orientedCarImg = pygame.transform.rotate(carImg, 90)
-bg = pygame.image.load("imgs/screen.png")
+bg = pygame.image.load("imgs/screen.png").convert()
 
 THRESHOLD = 0.55
-NB_CAR = 20
+NB_CAR = 30
 NB_GENERATION = 30
 TIME_RACE = 200
 
 DEBUG_MODE = True
+PAUSE_MODE = False
+VIEW_MODE = True
 
 ga = lga.GeneticAlgorithm(ni=NB_CAR)
 
@@ -27,8 +32,6 @@ for i in range(NB_CAR):
     cars.append(car)
 
 
-pygame.init()
-gameDisplay = pygame.display.set_mode((800,600))
 pygame.display.set_caption("Racing")
 clock = pygame.time.Clock()
 
@@ -37,7 +40,7 @@ gameIsOn = True
 x = 350
 y = 150
 orientation = 90
-acceleration = 0
+speed = 0
 
 # CHECKPOINTS
 pygame.draw.rect(bg,(0,0,255), (310,130, 20,80))    # center (320,170)
@@ -51,6 +54,7 @@ bests, means, nbrIndiv, counters = [], [], [], []
 file = open("Test.txt", "w")
 
 for gen in range(NB_GENERATION):
+    timeGen = time.time()
     print("Gen " + str(gen))
     timeCurrent = time.time()
 
@@ -61,22 +65,33 @@ for gen in range(NB_GENERATION):
         for event in pygame.event.get():
             if(event.type == pygame.QUIT):
                 pygame.quit()
-
+            if(event.type == pygame.KEYDOWN):
+                if event.key == pygame.K_d :
+                    DEBUG_MODE = not DEBUG_MODE
+                if event.key == pygame.K_SPACE :
+                    PAUSE_MODE = not PAUSE_MODE
+                if event.key == pygame.K_v:
+                    if VIEW_MODE:
+                        for car in cars :
+                            car.orientedCarImg = None
+                    else :
+                        car.orientedCarImg = pygame.transform.rotate(carImg, car.orientation)
+                    VIEW_MODE = not VIEW_MODE
         gameDisplay.blit(bg, (0,0))
         for car in cars:
             if(not car.alive):
                 continue
 
-            if(car.acceleration > 0):
-                car.acceleration -= min(0.5, car.acceleration)
+            if(car.speed > 0):
+                car.speed -= min(0.5, car.speed)
             
             if(car.x >= 0 and car.x < 800 and car.y >= 0 and car.y < 600):
                 if(bg.get_at((int(car.x),int(car.y))) == (181, 230, 29, 255)):
                     car.alive = False
                     if(lastPixel != bg.get_at((int(car.x),int(car.y)))):
-                        car.acceleration/=3
+                        car.speed/=3
                         car.alive = False
-                    car.acceleration -= min(0.45, car.acceleration)
+                    car.speed -= min(0.45, car.speed)
                 if(bg.get_at((int(car.x),int(car.y))) == (0,0,255) and car.nextCheckpoint == 1):
                     print("Finish ! - time = " + str(time.time()-timeRace))
                     car.nextCheckpoint=2
@@ -107,9 +122,9 @@ for gen in range(NB_GENERATION):
                         if(dist == 0):
                             dist = -1
                             break
-                    DEBUG_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx*50,car.y+dy*50))
+                    VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx*50,car.y+dy*50))
                 else :
-                    DEBUG_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx*50,car.y+dy*50))
+                    VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx*50,car.y+dy*50))
                 
                 # other directions
                 if(bg.get_at((int(car.x+dx2*50),int(car.y+dy2*50))) == (181, 230, 29, 255)):
@@ -118,9 +133,9 @@ for gen in range(NB_GENERATION):
                         if(dist2 == 0):
                             dist2 = -1
                             break
-                    DEBUG_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
+                    VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
                 else :
-                    DEBUG_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
+                    VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
                     
                 if(bg.get_at((int(car.x+dx3*50),int(car.y+dy3*50))) == (181, 230, 29, 255)):
                     while(bg.get_at((int(car.x+dx3*dist3),int(car.y+dy3*dist3))) == (181, 230, 29, 255)):
@@ -128,24 +143,24 @@ for gen in range(NB_GENERATION):
                         if(dist3 == 0):
                             dist3 = -1
                             break
-                    DEBUG_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
+                    VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
                 else :
-                    DEBUG_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
+                    VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
 
-            car.totalDistance += car.acceleration
+            car.totalDistance += car.speed
             if endGame > 30:
                 car.lastX = car.x
                 car.lastY = car.y
-            car.x += dx*car.acceleration
-            car.y += dy*car.acceleration
+            car.x += dx*car.speed
+            car.y += dy*car.speed
             if(car.x < 0 or car.x >= 800 or car.y < 0 or car.y >= 600):
-                car.x -= dx*car.acceleration
-                car.y -= dy*car.acceleration
+                car.x -= dx*car.speed
+                car.y -= dy*car.speed
 
-            gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
-            gameDisplay.blit(lineSurface, (0,0))
+            VIEW_MODE and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
+            VIEW_MODE and gameDisplay.blit(lineSurface, (0,0))
 
-            listInput = car.nn.evaluate([acceleration, dist, dist2, dist3])
+            listInput = car.nn.evaluate([speed, dist, dist2, dist3])
             if(listInput[0] >= THRESHOLD):
                 car.orientation -= 5
 
@@ -153,10 +168,10 @@ for gen in range(NB_GENERATION):
                 car.orientation += 5
 
             if(listInput[2] >= THRESHOLD):
-                car.acceleration += 1
+                car.speed += 1
 
             if(listInput[3] >= THRESHOLD):
-                car.acceleration -= 0.5
+                car.speed -= 0.5
 
             if car.x != car.lastX or car.y != car.lastY:
                 tokenStop = False
@@ -166,6 +181,11 @@ for gen in range(NB_GENERATION):
         pygame.display.update()
         clock.tick(30)
         endGame += 1
+
+    maxDist = 0
+    for car in cars :
+        maxDist = max(car.totalDistance, maxDist)
+    print("Best : " + str(round(maxDist, 1)) + ", fps : " +str(round(endGame/(time.time()-timeGen), 1)))
 
     # Mandatory (before evolve)
     ga.fitness(cars)

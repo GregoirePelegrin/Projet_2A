@@ -8,14 +8,14 @@ class Car():
         else:
             self.id = Car.counter
         self.alive = True
-        self.acceleration = 0
+        self.speed = 0
         self.orientation = 90
         self.x = 350
         self.y = 150
         self.lastX = 0
         self.lastY = 0
         self.totalDistance = 0
-        self.nn = lnn.NeuralNetwork(size=[4,16,32,16,4])
+        self.nn = lnn.NeuralNetwork(size=[4,16,64,16,4])
         self.nextCheckpoint = 2
         self.orientedCarImg = None
         self.checkpointPassedCounter = 0
