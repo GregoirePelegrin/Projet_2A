@@ -1,6 +1,8 @@
 from random import uniform
 import math
 
+NN_SIZE = [4,16,32,16,4]
+
 # Activation functions
 def relu(x):
 	return max(0, x)
@@ -99,9 +101,7 @@ class NeuralNetwork():
 			for l in neural.layers:
 				self.layers.append(Layer(layer=l))
 	def __str__(self):
-		temp = "NeuralNetwork:\n"
-		for l in self.layers:
-			temp += "\t" + str(l) + "\n"
+		temp = "NeuralNetwork: {}".format(self.fitness)
 		return temp
 	def __repr__(self):
 		temp = ""

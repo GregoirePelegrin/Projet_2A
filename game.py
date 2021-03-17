@@ -4,7 +4,7 @@ import pygame
 import time
 
 import Libraries.LibraryGame as lg
-import Libraries.LibraryGeneticAlgorithm2 as lga
+import Libraries.LibraryGeneticAlgorithm3 as lga
 import Libraries.LibraryNeuralNetwork as lnn
 
 carImg = pygame.image.load("imgs/car.png")
@@ -48,7 +48,6 @@ timeRace = time.time()
 lastPixel = bg.get_at((int(x),int(y)))
 
 bests, means, nbrIndiv, counters = [], [], [], []
-file = open("Test.txt", "w")
 
 for gen in range(NB_GENERATION):
     print("Gen " + str(gen))
@@ -167,17 +166,19 @@ for gen in range(NB_GENERATION):
         clock.tick(30)
         endGame += 1
 
-    # Mandatory (before evolve)
-    ga.fitness(cars)
-    # <Display only>
-    temp_results = ga.evaluate(cars)
-    bests.append(temp_results[0])
-    means.append(temp_results[1])
-    file.write("Gen {}\n{}".format(gen, temp_results[2]))
-    counters.append(temp_results[3])
-    nbrIndiv.append(len(cars))
-    # </Display only>
-    ga.evolve(cars)
+    temp_data = ga.evolve(cars)
+    print(temp_data)
+    bests.append(temp_data[0])
+    m = 0
+    c = 0
+    for fitness in temp_data:
+        if fitness == bests[-1]:
+            c += 1
+        m += fitness
+    means.append(m / len(temp_data))
+    counters.append(c)
+    nbrIndiv.append(len(temp_data))
+
 
 X = [x for x in range(NB_GENERATION)]
 ax1 = plt.subplot(211)
