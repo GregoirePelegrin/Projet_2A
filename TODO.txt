@@ -1,0 +1,3 @@
+Garder toutes les fitness de toutes les generations => plus de data à analyser
+Graphe du nbre d'elts qui sont meilleurs que le best précédent
+Histogramme des fitness pour chaque génération
