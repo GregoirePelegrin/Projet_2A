@@ -182,6 +182,11 @@ for gen in range(NB_GENERATION):
         pygame.display.update()
         clock.tick(30)
         endGame += 1
+    
+    maxDist = 0
+    for car in cars :
+        maxDist = max(car.totalDistance, maxDist)
+    print("Best : " + str(round(maxDist, 1)) + ", fps : " +str(round(endGame/(time.time()-timeGen), 1)))
 
     temp_data = ga.evolve(cars)
     bests.append(temp_data[0])
@@ -194,11 +199,6 @@ for gen in range(NB_GENERATION):
     means.append(m / len(temp_data))
     counters.append(c)
     nbrIndiv.append(len(temp_data))
-    
-    maxDist = 0
-    for car in cars :
-        maxDist = max(car.totalDistance, maxDist)
-    print("Best : " + str(round(maxDist, 1)) + ", fps : " +str(round(endGame/(time.time()-timeGen), 1)))
 
 X = [x for x in range(NB_GENERATION)]
 ax1 = plt.subplot(211)
