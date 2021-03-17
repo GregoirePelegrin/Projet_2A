@@ -8,7 +8,7 @@ class Car():
         else:
             self.id = Car.counter
         self.alive = True
-        self.acceleration = 0
+        self.speed = 0
         self.orientation = 90
         self.x = 350
         self.y = 150
