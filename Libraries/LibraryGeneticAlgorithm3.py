@@ -96,7 +96,7 @@ class GeneticAlgorithm():
 		return selections
 	def tweak(self, best):
 		# Ajouter le best à la prochaine génération
-		self.nextGeneration.append(lnn.NeuralNetwork(neural=best))
+		self.nextGeneration.append(best)
 		# Faire des petites variations sur le best et les ajouter à la prochaine génération
 		for i in range(int(15*self.NUMBER_INDIVIDUALS/40)-1):
 			temp_nn = lnn.NeuralNetwork(neural=best)
