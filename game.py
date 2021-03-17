@@ -4,7 +4,7 @@ import pygame
 import time
 
 import Libraries.LibraryGame as lg
-import Libraries.LibraryGeneticAlgorithm2 as lga
+import Libraries.LibraryGeneticAlgorithm3 as lga
 import Libraries.LibraryNeuralNetwork as lnn
 
 pygame.init()
@@ -15,8 +15,8 @@ orientedCarImg = pygame.transform.rotate(carImg, 90)
 bg = pygame.image.load("imgs/screen.png").convert()
 
 THRESHOLD = 0.55
-NB_CAR = 30
-NB_GENERATION = 30
+NB_CAR = 50
+NB_GENERATION = 60
 TIME_RACE = 200
 
 DEBUG_MODE = True
@@ -51,7 +51,6 @@ timeRace = time.time()
 lastPixel = bg.get_at((int(x),int(y)))
 
 bests, means, nbrIndiv, counters = [], [], [], []
-file = open("Test.txt", "w")
 
 for gen in range(NB_GENERATION):
     timeGen = time.time()
@@ -126,7 +125,8 @@ for gen in range(NB_GENERATION):
                 else :
                     VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx*50,car.y+dy*50))
                 
-                # other directions
+            # other directions
+            if(int(car.x+dx2*50) >= 0 and int(car.x+dx2*50) < 800 and int(car.y+dy2*50) >= 0 and int(car.y+dy2*50) < 600):
                 if(bg.get_at((int(car.x+dx2*50),int(car.y+dy2*50))) == (181, 230, 29, 255)):
                     while(bg.get_at((int(car.x+dx2*dist2),int(car.y+dy2*dist2))) == (181, 230, 29, 255)):
                         dist2 -= 1
@@ -136,7 +136,8 @@ for gen in range(NB_GENERATION):
                     VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
                 else :
                     VIEW_MODE and DEBUG_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
-                    
+            
+            if(int(car.x+dx3*50) >= 0 and int(car.x+dx3*50) < 800 and int(car.y+dy3*50) >= 0 and int(car.y+dy3*50) < 600):
                 if(bg.get_at((int(car.x+dx3*50),int(car.y+dy3*50))) == (181, 230, 29, 255)):
                     while(bg.get_at((int(car.x+dx3*dist3),int(car.y+dy3*dist3))) == (181, 230, 29, 255)):
                         dist3 -= 1
@@ -182,22 +183,22 @@ for gen in range(NB_GENERATION):
         clock.tick(30)
         endGame += 1
 
+    temp_data = ga.evolve(cars)
+    bests.append(temp_data[0])
+    m = 0
+    c = 0
+    for fitness in temp_data:
+        if fitness == bests[-1]:
+            c += 1
+        m += fitness
+    means.append(m / len(temp_data))
+    counters.append(c)
+    nbrIndiv.append(len(temp_data))
+    
     maxDist = 0
     for car in cars :
         maxDist = max(car.totalDistance, maxDist)
     print("Best : " + str(round(maxDist, 1)) + ", fps : " +str(round(endGame/(time.time()-timeGen), 1)))
-
-    # Mandatory (before evolve)
-    ga.fitness(cars)
-    # <Display only>
-    temp_results = ga.evaluate(cars)
-    bests.append(temp_results[0])
-    means.append(temp_results[1])
-    file.write("Gen {}\n{}".format(gen, temp_results[2]))
-    counters.append(temp_results[3])
-    nbrIndiv.append(len(cars))
-    # </Display only>
-    ga.evolve(cars)
 
 X = [x for x in range(NB_GENERATION)]
 ax1 = plt.subplot(211)
