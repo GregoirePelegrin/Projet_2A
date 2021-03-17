@@ -28,7 +28,7 @@ class GeneticAlgorithm():
 		self.mutate(self.crossing(self.selection()))
 		# 4/ Ajouter le reste (populate) à la prochaine génération
 		self.populate()
-		# 5/ Attribuer la nouvelle génération aux individus
+		# 5/ Attribuer la nouvelle génération aux individus + les reinitialiser
 		for individual, neural in zip(individuals, self.nextGeneration):
 			individual.nn = neural
 			individual.reinitialization()
@@ -101,4 +101,9 @@ class GeneticAlgorithm():
 		for i in range(int(15*self.NUMBER_INDIVIDUALS/40)-1):
 			temp_nn = lnn.NeuralNetwork(neural=best)
 			# Ajouter des tweaks ici
+			for j in range(randint(5, 25)):
+				temp_indLay = randint(1, len(temp_nn.layers)-1)
+				temp_indNeu = randint(1, len(temp_nn.layers[temp_indLay].neurons)-1)
+				temp_indWei = randint(1, len(temp_nn.layers[temp_indLay].neurons[temp_indNeu].weights)-1)
+				temp_nn.layers[temp_indLay].neurons[temp_indNeu].weights[temp_indWei] += uniform(-0.2, 0.2)
 			self.nextGeneration.append(temp_nn)
