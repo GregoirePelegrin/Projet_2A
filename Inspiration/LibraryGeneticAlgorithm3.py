@@ -11,8 +11,12 @@ class GeneticAlgorithm():
 		self.PROBABILITY_CROSSOVER = pc
 		self.PROBABILITY_MUTATION = pm
 
+		self.currentGen = 0
 		self.fitnessSorted = []
 		self.nextGeneration = []
+
+		file = open("Test.txt", "w")
+		file.close()
 	def __str__(self):
 		return "GeneticAlgorithm(cf={}, ni={}, pc={}, pm={})".format(self.COEFF_FITNESS, 
 			self.NUMBER_INDIVIDUALS, self.PROBABILITY_CROSSOVER, self.PROBABILITY_MUTATION)
@@ -20,6 +24,7 @@ class GeneticAlgorithm():
 	def evolve(self, individuals):
 		self.fitnessSorted.clear()
 		self.nextGeneration.clear()
+		self.currentGen += 1
 
 		temp = self.fitness(individuals)
 		# 2/ Ajouter les variations des best à la prochaine génération
@@ -47,8 +52,6 @@ class GeneticAlgorithm():
 				index += 1
 			self.fitnessSorted.insert(index, individual.nn)
 			fitnessList.insert(index, individual.nn.fitness)
-		# 3/ Ecris le best dans un fichier
-		# Not implemented yet, useful?
 		return fitnessList
 
 	def crossing(self, selections):
@@ -97,6 +100,8 @@ class GeneticAlgorithm():
 	def tweak(self, best):
 		# Ajouter le best à la prochaine génération
 		self.nextGeneration.append(best)
+		with open("Test.txt", "a") as f:
+			f.write("Gen {}\n{}".format(self.currentGen, repr(best)))
 		# Faire des petites variations sur le best et les ajouter à la prochaine génération
 		for i in range(int(15*self.NUMBER_INDIVIDUALS/40)-1):
 			temp_nn = lnn.NeuralNetwork(neural=best)

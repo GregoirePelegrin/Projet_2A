@@ -1,7 +1,7 @@
 from random import uniform
 import math
 
-NN_SIZE = [4,16,32,16,4]
+NN_SIZE = [4, 3, 3, 4]
 
 # Activation functions
 def relu(x):
