@@ -1,4 +1,3 @@
-import Libraries.LibraryNeuralNetwork as lnn
 
 class Car():
     counter = 0
@@ -15,7 +14,7 @@ class Car():
         self.lastX = 0
         self.lastY = 0
         self.totalDistance = 0
-        self.nn = lnn.NeuralNetwork(size=lnn.NN_SIZE)
+        self.nn = None
         self.nextCheckpoint = 2
         self.orientedCarImg = None
         self.checkpointPassedCounter = 0
