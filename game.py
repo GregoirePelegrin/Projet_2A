@@ -8,7 +8,7 @@ import Libraries.LibraryGame as lg
 import Libraries.collisionDetection as cd
 
 THRESHOLD = 0.55
-NB_CAR = 100
+NB_CAR = 200
 NB_GENERATION = 500
 TIME_RACE = 60
 
@@ -32,7 +32,6 @@ finished = False
 drawing = False
 points = []
 
-### TO NUMPY
 exterior = [(231, 67), (370, 57), (502, 59), (602, 81), (625, 99), (635, 132), (635, 165), (622, 214), (619, 243), (629, 274), (647, 305), (654, 343), (652, 363), (647, 382), (637, 402), (620, 426), (605, 452), (592, 473), (567, 485), (544, 490), (517, 490), (494, 486), (467, 478), (461, 471), (442, 465), (422, 463), (399, 473), (385, 487), (365, 508), (347, 528), (310, 548), (284, 552), (256, 554), (229, 548), (214, 534), (202, 514), (182, 502), (174, 490), (161, 462), (154, 442), (152, 415), (151, 383), (150, 352), (142, 337), (133, 318), (119, 302), (101, 282), (92, 258), (91, 233), (96, 210), (104, 182), (114, 161), (125, 135), (137, 110), (158, 91), (178, 79), (205, 72), (230, 68)]
 pygame.draw.lines(gameDisplay, (255,255,255), False, exterior)
 interior = [(303, 100), (345, 98), (392, 96), (442, 96), (479, 100), (514, 106), (550, 118), (567, 130), (571, 142), (574, 158), (570, 173), (567, 198), (564, 216), (565, 230), (570, 256), (576, 278), (581, 286), (587, 304), (593, 329), (598, 346), (598, 362), (594, 373), (582, 390), (574, 402), (561, 412), (538, 421), (515, 420), (492, 416), (466, 412), (453, 413), (431, 418), (409, 424), (394, 428), (370, 442), (353, 459), (334, 474), (294, 485), (269, 485), (253, 477), (239, 466), (230, 450), (222, 423), (215, 400), (212, 381), (202, 351), (194, 321), (180, 295), (166, 270), (154, 245), (154, 217), (159, 198), (168, 178), (184, 155), (202, 141), (225, 123), (243, 110), (275, 102), (302, 100), (302, 100)]
@@ -54,6 +53,12 @@ while gen < NB_GENERATION and not finished :
             if(event.type == pygame.KEYDOWN):
                 if event.key == pygame.K_v :
                     VIEW_MODE = not VIEW_MODE
+                    if not VIEW_MODE :
+                        for car in cars :
+                            car.orientedCarImg = None
+                    else :
+                        for car in cars :
+                            car.orientedCarImg = pygame.transform.rotate(carImg, car.orientation)
                 if event.key == pygame.K_e :
                     gen = NB_GENERATION
             if(event.type == pygame.MOUSEBUTTONDOWN):
@@ -96,12 +101,14 @@ while gen < NB_GENERATION and not finished :
                 continue
 
             ######## Drawing  and views calculations
-            car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
-            new_rect = car.orientedCarImg.get_rect(center = (car.x,car.y))
-            VIEW_MODE and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
+            if VIEW_MODE :
+                car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
+                new_rect = car.orientedCarImg.get_rect(center = (car.x,car.y))
 
-            lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
-            lineSurface = lineSurface.convert_alpha()
+                lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
+                lineSurface = lineSurface.convert_alpha()
+
+            VIEW_MODE and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
 
             dx1 = math.cos((car.orientation-90) * math.pi / 180)
             dy1 = math.sin((car.orientation-90) * math.pi / 180)
@@ -198,6 +205,9 @@ while gen < NB_GENERATION and not finished :
         car.orientation = 90
         car.x = 350
         car.y = 80
+
+    t = round(time.time()-timeGen, 1)
+    print("Time gen : " + str(t) + "s / " + str(round(timeRace / t,1)) + " fps")
     gen += 1
 
 print(points)
