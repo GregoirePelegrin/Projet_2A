@@ -7,6 +7,8 @@ import numpy as np
 NEURAL_NETWORK_SIZE = [5]
 
 # Activation functions
+def identity(x):
+    return x
 def relu(x):
     return max(0, x)
 def sigmoid(x):
@@ -15,11 +17,15 @@ def sigmoid(x):
 # Classes
 class Neuron:
     objectCounter = 0
-    def __init__(self, neuron=None):
+    def __init__(self, dimension=None, neuron=None):
         self.id = Neuron.objectCounter
         self.value = 0
-        if neuron != None:
+        if dimension != None:
+            self.populate(dimension)
+        elif neuron != None:
             self.copy(neuron)
+        else:
+            print("Neuron.__init__(): Error, must specify dimension or neuron")
         Neuron.objectCounter += 1
     def __str__(self):
         return "Neuron(id={}, value={})".format(self.id, self.value)
@@ -31,27 +37,28 @@ class Neuron:
         self.weights = neuron.weights.copy()
     def evaluate(self, inputs):
         self.value = sigmoid(np.sum(self.weights * inputs) + self.bias)
-    def initialWeighing(self, size):
+    def populate(self, size):
         self.bias = uniform(-1, 1)
         self.weights = 2*np.random.rand(size)-1
 
-# TODO: Tests !
 class Layer:
     objectCounter = 0
-    def __init__(self, dimension=0, layer=None):
+    def __init__(self, dimension=None, layer=None):
         self.id = Layer.objectCounter
         self.neurons = []
-        if layer != None:
+        if dimension != None:
             self.populate(dimension)
-        else:
+        elif layer != None:
             self.copy(layer)
+        else:
+            print("Layer.__init__(): Error, must specify dimension or layer")
         Layer.objectCounter += 1
     def __str__(self):
         return "Layer(id={})".format(self.id)
     def __repr__(self):
-        temp = "Layer(id={}\n\t".format(self.id)
+        temp = "Layer(id={},\n\t".format(self.id)
         for n in self.neurons:
-            temp += repr(n) + "\n\t"
+            temp += repr(n) + ",\n\t"
         temp += ")"
         return temp
 
@@ -66,10 +73,7 @@ class Layer:
         for n in self.neurons:
             temp = np.append(temp, [n.value])
         return temp
-    def populate(self, size):
-        for i in range(size):
-            self.neurons.append(Neuron())
-    def initialWeighing(self, size):
-        for n in self.neurons:
-            n.initialWeighing(size)
+    def populate(self, dimension):
+        for i in range(dimension[0]):
+            self.neurons.append(Neuron(dimension=dimension[1]))
 # TODO: NeuralNetwork class
