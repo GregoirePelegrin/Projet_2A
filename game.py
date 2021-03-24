@@ -139,21 +139,16 @@ while gen < NB_GENERATION and not finished :
                 dist1 = 50
             else :
                 dist1 = math.sqrt( (car.x-dist1[0])**2 + (car.y-dist1[1])**2 )
-                if dist1 < 8 :
-                    car.alive = False
             if dist2 is None :
                 dist2 = 50
             else :
                 dist2 = math.sqrt( (car.x-dist2[0])**2 + (car.y-dist2[1])**2 )
-                if dist2 < 8 :
-                    car.alive = False
             if dist3 is None :
                 dist3 = 50
             else :
                 dist3 = math.sqrt( (car.x-dist3[0])**2 + (car.y-dist3[1])**2 )
-                if dist3 < 8 :
-                    car.alive = False
-            if(not car.alive):
+            if(dist1 < 10 or dist2 < 10 or dist3 < 10):
+                car.alive = False
                 continue
 
             if dist1 < 50 :
@@ -177,8 +172,8 @@ while gen < NB_GENERATION and not finished :
             car.y += dy1*car.speed
 
             ######## Neural network inputs
-            listInput = car.nn.evaluate([car.speed, dist1, dist2, dist3])
-            #listInput = [random.uniform(0, 1),random.uniform(0, 1)]
+            #listInput = car.nn.evaluate([car.speed, dist1, dist2, dist3])
+            listInput = [random.uniform(0, 1),random.uniform(0, 1)]
             
             if(listInput[0] >= THRESHOLD):
                 car.orientation -= 5
