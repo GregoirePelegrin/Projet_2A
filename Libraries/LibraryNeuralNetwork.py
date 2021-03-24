@@ -4,7 +4,7 @@ import math
 import numpy as np
 
 # Constants
-NEURAL_NETWORK_SIZE = [5]
+NEURAL_NETWORK_SIZE = [5, 2]
 
 # Activation functions
 def identity(x):
@@ -35,11 +35,18 @@ class Neuron:
     def copy(self, neuron):
         self.bias = neuron.bias
         self.weights = neuron.weights.copy()
+    def display(self):
+        temp = ["Neuron(id={}, value={}".format(self.id, self.value), "\tbiais={}".format(self.bias), "\tweights={})".format(self.weights)]
+        return temp
     def evaluate(self, inputs):
         self.value = sigmoid(np.sum(self.weights * inputs) + self.bias)
     def populate(self, size):
-        self.bias = uniform(-1, 1)
-        self.weights = 2*np.random.rand(size)-1
+        if size == 0:
+            self.bias = None
+            self.weights = []
+        else:
+            self.bias = uniform(-1, 1)
+            self.weights = 2*np.random.rand(size)-1
 
 class Layer:
     objectCounter = 0
@@ -62,9 +69,18 @@ class Layer:
         temp += ")"
         return temp
 
+    def assignValue(self, values):
+        for n,v in zip(self.neurons, values):
+            n.value = v
     def copy(self, layer):
         for n in layer.neurons:
             self.neurons.append(Neuron(neuron=n))
+    def display(self):
+        result = ["Layer(id={}".format(self.id)]
+        for n in self.neurons:
+            for elt in n.display():
+                result.append("\t" + elt)
+        return result
     def evaluate(self, inputs):
         for n in self.neurons:
             n.evaluate(inputs)
@@ -76,4 +92,49 @@ class Layer:
     def populate(self, dimension):
         for i in range(dimension[0]):
             self.neurons.append(Neuron(dimension=dimension[1]))
-# TODO: NeuralNetwork class
+
+class NeuralNetwork:
+    objectCounter = 0
+    def __init__(self, neural=None):
+        self.id = NeuralNetwork.objectCounter
+        self.layers = []
+        if neural != None:
+            self.copy(neural)
+        else:
+            self.populate()
+        NeuralNetwork.objectCounter += 1
+    def __str__(self):
+        return "NeuralNetwork(id={})".format(self.id)
+    def __repr__(self):
+        temp = "NeuralNetwork(id={},\n\t".format(self.id)
+        for l in self.layers:
+            temp += repr(l) + ",\n\t"
+        temp += ")"
+        return temp
+    
+    def assignInput(self, values):
+        self.layers[0].assignValue(values)
+    def copy(self, neural):
+        for l in neural.layers:
+            self.layers.append(Layer(layer=l))
+    def display(self):
+        temp = ["NeuralNetwork(id={}".format(self.id)]
+        for l in self.layers:
+            for elt in l.display():
+                temp.append("\t" + elt)
+        result = ""
+        for elt in temp:
+            result += elt + "\n"
+        return result
+    def evaluate(self, inputs):
+        if len(inputs) != NEURAL_NETWORK_SIZE[0]:
+            print("NeuralNetwork.evaluate(): Error, inputs dimension mismatch input layer of neural network")
+        else:
+            self.assignInput(inputs)
+            for i in range(1, len(self.layers)):
+                self.layers[i].evaluate(self.layers[i-1].getState())
+        return self.layers[-1].getState()
+    def populate(self):
+        self.layers.append(Layer(dimension=(NEURAL_NETWORK_SIZE[0], 0)))
+        for i in range(1, len(NEURAL_NETWORK_SIZE)):
+            self.layers.append(Layer(dimension=(NEURAL_NETWORK_SIZE[i], NEURAL_NETWORK_SIZE[i-1])))
