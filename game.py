@@ -8,8 +8,8 @@ import Libraries.LibraryGame as lg
 import Libraries.collisionDetection as cd
 
 THRESHOLD = 0.55
-NB_CAR = 200
-NB_GENERATION = 500
+NB_CAR = 50
+NB_GENERATION = 10
 TIME_RACE = 60
 
 pygame.init()
@@ -26,6 +26,7 @@ for i in range(NB_CAR):
     cars.append(car)
 
 VIEW_MODE = True
+VIEW_BESTS_MODE = False
 
 finished = False
 
@@ -52,15 +53,27 @@ while gen < NB_GENERATION and not finished :
                 pygame.quit()
             if(event.type == pygame.KEYDOWN):
                 if event.key == pygame.K_v :
+                    # Activate / deactivate viewing
                     VIEW_MODE = not VIEW_MODE
                     if not VIEW_MODE :
                         for car in cars :
                             car.orientedCarImg = None
+                if event.key == pygame.K_e :
+                    # End simulation
+                    gen = NB_GENERATION
+                if event.key == pygame.K_b :
+                    # Activate / deactivate view of best cars
+                    VIEW_BESTS_MODE = not VIEW_BESTS_MODE
+                    if VIEW_BESTS_MODE:
+                        cars = sorted(cars, key=lambda x: x.totalDistance, reverse=True)
+                        for car in cars[10:]:
+                            car.orientedCarImg = None
+                            car.visible = False
                     else :
                         for car in cars :
-                            car.orientedCarImg = pygame.transform.rotate(carImg, car.orientation)
-                if event.key == pygame.K_e :
-                    gen = NB_GENERATION
+                            car.visible = True
+
+
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 points.append(event.pos)
                 drawing = True
@@ -101,14 +114,14 @@ while gen < NB_GENERATION and not finished :
                 continue
 
             ######## Drawing  and views calculations
-            if VIEW_MODE :
+            if VIEW_MODE and car.visible :
                 car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
                 new_rect = car.orientedCarImg.get_rect(center = (car.x,car.y))
 
                 lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
                 lineSurface = lineSurface.convert_alpha()
 
-            VIEW_MODE and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
+            VIEW_MODE and car.visible and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
 
             dx1 = math.cos((car.orientation-90) * math.pi / 180)
             dy1 = math.sin((car.orientation-90) * math.pi / 180)
@@ -159,20 +172,20 @@ while gen < NB_GENERATION and not finished :
                 continue
 
             if dist1 < 50 :
-                VIEW_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
             else:
-                VIEW_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
             if dist2 < 50 :
-                VIEW_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
             else:
-                VIEW_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
             if dist3 < 50 :
-                VIEW_MODE and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
             else:
-                VIEW_MODE and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
 
-            VIEW_MODE and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
-            VIEW_MODE and gameDisplay.blit(lineSurface, (0,0))
+            VIEW_MODE and car.visible and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
+            VIEW_MODE and car.visible and gameDisplay.blit(lineSurface, (0,0))
             ########
 
             car.x += dx1*car.speed
@@ -206,8 +219,9 @@ while gen < NB_GENERATION and not finished :
         car.x = 350
         car.y = 80
 
-    t = round(time.time()-timeGen, 1)
-    print("Time gen : " + str(t) + "s / " + str(round(timeRace / t,1)) + " fps")
+    t = time.time()-timeGen
+    if t != 0 :
+        print("Time gen : " + str(round(t,1)) + "s / " + str(round(timeRace / t,1)) + " fps")
     gen += 1
 
 print(points)
