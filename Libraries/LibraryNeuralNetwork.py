@@ -4,7 +4,7 @@ import math
 import numpy as np
 
 # Constants
-NEURAL_NETWORK_SIZE = [5, 2]
+NEURAL_NETWORK_SIZE = [3, 2]
 
 # Activation functions
 def identity(x):
@@ -96,6 +96,7 @@ class Layer:
 class NeuralNetwork:
     objectCounter = 0
     def __init__(self, neural=None):
+        self.fitness = -10
         self.id = NeuralNetwork.objectCounter
         self.layers = []
         if neural != None:

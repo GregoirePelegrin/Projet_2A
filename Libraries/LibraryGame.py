@@ -1,3 +1,5 @@
+import Libraries.LibraryNeuralNetwork as lnn
+
 
 class Car():
     counter = 0
@@ -15,10 +17,8 @@ class Car():
         self.lastX = 0
         self.lastY = 0
         self.totalDistance = 0
-        self.nn = None
-        self.nextCheckpoint = 2
+        self.nn = lnn.NeuralNetwork()
         self.orientedCarImg = None
-        self.checkpointPassedCounter = 0
         Car.counter += 1
     def __str__(self):
         return "Car({})".format(self.id)
@@ -32,8 +32,6 @@ class Car():
         self.y = 90
         self.nn.fitness = 0
         self.totalDistance = 0
-        self.nextCheckpoint = 2
-        self.checkpointPassedCounter = 0
 
     def copy(self):
         new_car = Car()
