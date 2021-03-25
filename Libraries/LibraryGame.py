@@ -7,6 +7,7 @@ class Car():
         else:
             self.id = Car.counter
         self.alive = True
+        self.visible = True
         self.speed = 10
         self.orientation = 90
         self.x = 350
@@ -24,6 +25,7 @@ class Car():
 
     def reinitialization(self):
         self.alive = True
+        self.visible = True
         self.acceleration = 0
         self.orientation = 80
         self.x = 350
