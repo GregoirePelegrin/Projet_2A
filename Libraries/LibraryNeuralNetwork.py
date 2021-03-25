@@ -36,7 +36,7 @@ class Neuron:
         self.bias = neuron.bias
         self.weights = neuron.weights.copy()
     def display(self):
-        temp = ["Neuron(id={}, value={}".format(self.id, self.value), "\tbiais={}".format(self.bias), "\tweights={})".format(self.weights)]
+        temp = ["Neuron(id={}, value={}".format(self.id, self.value), "\tbias={}".format(self.bias), "\tweights={})".format(self.weights)]
         return temp
     def evaluate(self, inputs):
         self.value = sigmoid(np.sum(self.weights * inputs) + self.bias)
