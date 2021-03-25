@@ -4,7 +4,7 @@ import math
 import numpy as np
 
 # Constants
-NEURAL_NETWORK_SIZE = [3, 2]
+NEURAL_NETWORK_SIZE = [3, 10, 10, 2]
 
 # Activation functions
 def identity(x):

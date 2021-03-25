@@ -8,9 +8,9 @@ import Libraries.LibraryGame as lg
 import Libraries.collisionDetection as cd
 
 THRESHOLD = 0.55
-NB_CAR = 50
-NB_GENERATION = 10
-TIME_RACE = 60
+NB_CAR = 400
+NB_GENERATION = 50
+TIME_RACE = 300
 
 pygame.init()
 gameDisplay = pygame.display.set_mode((800,600))
@@ -193,10 +193,11 @@ while gen < NB_GENERATION and not finished :
 
                 car.x += dx1*car.speed
                 car.y += dy1*car.speed
+                car.totalDistance += (dx1**2+dy1**2)**0.5
 
                 ######## Neural network inputs
-                #listInput = car.nn.evaluate([car.speed, dist1, dist2, dist3])
-                listInput = [random.uniform(0, 1),random.uniform(0, 1)]
+                listInput = car.nn.evaluate([ dist1, dist2, dist3])
+                #listInput = [random.uniform(0, 1),random.uniform(0, 1)]
                 
                 if(listInput[0] >= THRESHOLD):
                     car.orientation -= 5
@@ -216,17 +217,14 @@ while gen < NB_GENERATION and not finished :
         # temp_data = ga.evolve(cars)
 
 
-
+    bestDist = 0
     for car in cars :
-        car.alive = True
-        car.speed = 10
-        car.orientation = 90
-        car.x = 350
-        car.y = 80
+        bestDist = max(bestDist, car.totalDistance)
+        car.reinitialization()
 
     t = time.time()-timeGen
     if t != 0 :
-        print("Time gen : " + str(round(t,1)) + "s / " + str(round(timeRace / t,1)) + " fps")
+        print("Time gen: " + str(round(t,1)) + "s / " + str(round(timeRace / t,1)) + " fps; bestDist: " + str(bestDist))
     gen += 1
 
 print(points)
