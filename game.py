@@ -3,18 +3,25 @@ import os
 import math
 import time
 import random
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import matplotlib.backends.backend_agg as agg
 
 import Libraries.LibraryGame as lg
 import Libraries.collisionDetection as cd
 
 THRESHOLD = 0.55
-NB_CAR = 400
+NB_CAR = 100
+NB_BEST_CAR = 10
 NB_GENERATION = 50
 TIME_RACE = 300
 
-pygame.init()
-gameDisplay = pygame.display.set_mode((800,600))
+#pygame.init() # Long to charge
+pygame.font.init()
+gameDisplay = pygame.display.set_mode((1300,600))
 pygame.display.set_caption("Racing")
+myfont = pygame.font.SysFont('Arial', 20)
 clock = pygame.time.Clock()
 
 carImg = pygame.image.load("imgs/car.png").convert_alpha()
@@ -39,7 +46,15 @@ pygame.draw.lines(gameDisplay, (255,255,255), False, exterior)
 interior = [(303, 100), (345, 98), (392, 96), (442, 96), (479, 100), (514, 106), (550, 118), (567, 130), (571, 142), (574, 158), (570, 173), (567, 198), (564, 216), (565, 230), (570, 256), (576, 278), (581, 286), (587, 304), (593, 329), (598, 346), (598, 362), (594, 373), (582, 390), (574, 402), (561, 412), (538, 421), (515, 420), (492, 416), (466, 412), (453, 413), (431, 418), (409, 424), (394, 428), (370, 442), (353, 459), (334, 474), (294, 485), (269, 485), (253, 477), (239, 466), (230, 450), (222, 423), (215, 400), (212, 381), (202, 351), (194, 321), (180, 295), (166, 270), (154, 245), (154, 217), (159, 198), (168, 178), (184, 155), (202, 141), (225, 123), (243, 110), (275, 102), (302, 100), (302, 100)]
 pygame.draw.lines(gameDisplay, (255,255,255), False, interior)
 
+# Graphs
+graph_bests = plt.figure(figsize=[3, 3])
+ax = graph_bests.add_subplot(111)
+ax.set_title("Fitness vs generations")
+canvas = agg.FigureCanvasAgg(graph_bests)
+bests = []
 
+currentBest = 0
+nbVisibleCars = NB_CAR
 gen = 0
 while gen < NB_GENERATION and not finished :
     timeGen = time.time()
@@ -65,14 +80,6 @@ while gen < NB_GENERATION and not finished :
                 if event.key == pygame.K_b :
                     # Activate / deactivate view of best cars
                     VIEW_BESTS_MODE = not VIEW_BESTS_MODE
-                    if VIEW_BESTS_MODE:
-                        cars = sorted(cars, key=lambda x: x.totalDistance, reverse=True)
-                        for car in cars[10:]:
-                            car.orientedCarImg = None
-                            car.visible = False
-                    else :
-                        for car in cars :
-                            car.visible = True
                 if event.key == pygame.K_SPACE:
                     # Pause generation
                     PAUSE_MODE = not PAUSE_MODE
@@ -107,90 +114,111 @@ while gen < NB_GENERATION and not finished :
                 pygame.draw.lines(gameDisplay, (0,255,0), False, points[-2:])
         ########
 
-        if not PAUSE_MODE :
-            VIEW_MODE and gameDisplay.fill((0,0,0))
-            VIEW_MODE and pygame.draw.lines(gameDisplay, (255,255,255), False, interior)
-            VIEW_MODE and pygame.draw.lines(gameDisplay, (255,255,255), False, exterior)
-
+        ######## Set cars visibility
+        if VIEW_BESTS_MODE:
+            cars = sorted(cars, key=lambda x: x.totalDistanceLast, reverse=True)
+            nbVisibleCars = NB_BEST_CAR
+            for car in cars[NB_BEST_CAR:]:
+                car.orientedCarImg = None
+                car.visible = False
+        else :
+            nbVisibleCars = NB_CAR
             for car in cars :
-                if(not car.alive):
-                    continue
+                car.visible = True
 
-                ######## Drawing  and views calculations
-                if VIEW_MODE and car.visible :
-                    car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
-                    new_rect = car.orientedCarImg.get_rect(center = (car.x,car.y))
+        gameDisplay.fill((0,0,0), (0,0,800,600))
+        pygame.draw.lines(gameDisplay, (255,255,255), False, interior)
+        pygame.draw.lines(gameDisplay, (255,255,255), False, exterior)
+        ######## Show numbers
+        textsurface = []
+        textsurface.append(myfont.render("Cars : {} ({} shown)".format(NB_CAR, nbVisibleCars), False, (255, 255, 255)))
+        textsurface.append(myfont.render("Gen : {}".format(gen), False, (255, 255, 255)))
+        textsurface.append(myfont.render("Best : {}".format(currentBest), False, (255, 255, 255)))
+        if PAUSE_MODE :
+            textsurface.append(myfont.render("== Game paused ==", False, (255, 255, 255)))
+        for line in range(len(textsurface)) :
+            gameDisplay.blit(textsurface[line],(0,line*20))
+            
+        for car in cars :
+            if(not car.alive):
+                continue
 
-                    lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
-                    lineSurface = lineSurface.convert_alpha()
+            ######## Drawing  and views calculations
+            if VIEW_MODE and car.visible :
+                car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
+                new_rect = car.orientedCarImg.get_rect(center = (car.x,car.y))
 
-                VIEW_MODE and car.visible and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
+                lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
+                lineSurface = lineSurface.convert_alpha()
 
-                dx1 = math.cos((car.orientation-90) * math.pi / 180)
-                dy1 = math.sin((car.orientation-90) * math.pi / 180)
-                dx2 = math.cos((car.orientation-45) * math.pi / 180)
-                dy2 = math.sin((car.orientation-45) * math.pi / 180)
-                dx3 = math.cos((car.orientation-135) * math.pi / 180)
-                dy3 = math.sin((car.orientation-135) * math.pi / 180)
+            VIEW_MODE and car.visible and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
 
-                dist1 = None
-                dist2 = None
-                dist3 = None
-                for p in range(len(interior)-1):
-                    if dist1 is None :
-                        dist1 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx1*50,car.y+dy1*50],
-                                                interior[p], interior[p+1])
-                    if dist2 is None :
-                        dist2 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx2*50,car.y+dy2*50],
-                                            [interior[p][0], interior[p][1]], [interior[p+1][0], interior[p+1][1]])
-                    if dist3 is None :
-                        dist3 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx3*50,car.y+dy3*50],
-                                            [interior[p][0], interior[p][1]], [interior[p+1][0], interior[p+1][1]])
+            dx1 = math.cos((car.orientation-90) * math.pi / 180)
+            dy1 = math.sin((car.orientation-90) * math.pi / 180)
+            dx2 = math.cos((car.orientation-45) * math.pi / 180)
+            dy2 = math.sin((car.orientation-45) * math.pi / 180)
+            dx3 = math.cos((car.orientation-135) * math.pi / 180)
+            dy3 = math.sin((car.orientation-135) * math.pi / 180)
 
-                for p in range(len(exterior)-1):
-                    if dist1 is None :
-                        dist1 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx1*50,car.y+dy1*50],
-                                            [exterior[p][0], exterior[p][1]], [exterior[p+1][0], exterior[p+1][1]])
-                    if dist2 is None :
-                        dist2 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx2*50,car.y+dy2*50],
-                                            [exterior[p][0], exterior[p][1]], [exterior[p+1][0], exterior[p+1][1]])
-                    if dist3 is None :
-                        dist3 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx3*50,car.y+dy3*50],
-                                            [exterior[p][0], exterior[p][1]], [exterior[p+1][0], exterior[p+1][1]])
-
+            dist1 = None
+            dist2 = None
+            dist3 = None
+            for p in range(len(interior)-1):
                 if dist1 is None :
-                    dist1 = 50
-                else :
-                    dist1 = math.sqrt( (car.x-dist1[0])**2 + (car.y-dist1[1])**2 )
+                    dist1 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx1*50,car.y+dy1*50],
+                                            interior[p], interior[p+1])
                 if dist2 is None :
-                    dist2 = 50
-                else :
-                    dist2 = math.sqrt( (car.x-dist2[0])**2 + (car.y-dist2[1])**2 )
+                    dist2 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx2*50,car.y+dy2*50],
+                                        [interior[p][0], interior[p][1]], [interior[p+1][0], interior[p+1][1]])
                 if dist3 is None :
-                    dist3 = 50
-                else :
-                    dist3 = math.sqrt( (car.x-dist3[0])**2 + (car.y-dist3[1])**2 )
-                if(dist1 < 10 or dist2 < 10 or dist3 < 10):
-                    car.alive = False
-                    continue
+                    dist3 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx3*50,car.y+dy3*50],
+                                        [interior[p][0], interior[p][1]], [interior[p+1][0], interior[p+1][1]])
 
-                if dist1 < 50 :
-                    VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
-                else:
-                    VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
-                if dist2 < 50 :
-                    VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
-                else:
-                    VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
-                if dist3 < 50 :
-                    VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
-                else:
-                    VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
+            for p in range(len(exterior)-1):
+                if dist1 is None :
+                    dist1 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx1*50,car.y+dy1*50],
+                                        [exterior[p][0], exterior[p][1]], [exterior[p+1][0], exterior[p+1][1]])
+                if dist2 is None :
+                    dist2 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx2*50,car.y+dy2*50],
+                                        [exterior[p][0], exterior[p][1]], [exterior[p+1][0], exterior[p+1][1]])
+                if dist3 is None :
+                    dist3 = cd.calculateIntersectPoint([car.x, car.y], [car.x+dx3*50,car.y+dy3*50],
+                                        [exterior[p][0], exterior[p][1]], [exterior[p+1][0], exterior[p+1][1]])
 
-                VIEW_MODE and car.visible and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
-                VIEW_MODE and car.visible and gameDisplay.blit(lineSurface, (0,0))
-                ########
+            if dist1 is None :
+                dist1 = 50
+            else :
+                dist1 = math.sqrt( (car.x-dist1[0])**2 + (car.y-dist1[1])**2 )
+            if dist2 is None :
+                dist2 = 50
+            else :
+                dist2 = math.sqrt( (car.x-dist2[0])**2 + (car.y-dist2[1])**2 )
+            if dist3 is None :
+                dist3 = 50
+            else :
+                dist3 = math.sqrt( (car.x-dist3[0])**2 + (car.y-dist3[1])**2 )
+            if(dist1 < 10 or dist2 < 10 or dist3 < 10):
+                car.alive = False
+                continue
 
+            if dist1 < 50 :
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
+            else:
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
+            if dist2 < 50 :
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
+            else:
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx2*50,car.y+dy2*50))
+            if dist3 < 50 :
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
+            else:
+                VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (0,255,0),(car.x,car.y),(car.x+dx3*50,car.y+dy3*50))
+
+            VIEW_MODE and car.visible and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
+            VIEW_MODE and car.visible and gameDisplay.blit(lineSurface, (0,0))
+            ########
+
+            if not PAUSE_MODE :
                 car.x += dx1*car.speed
                 car.y += dy1*car.speed
                 car.totalDistance += (dx1**2+dy1**2)**0.5
@@ -199,32 +227,45 @@ while gen < NB_GENERATION and not finished :
                 listInput = car.nn.evaluate([ dist1, dist2, dist3])
                 #listInput = [random.uniform(0, 1),random.uniform(0, 1)]
                 
-                if(listInput[0] >= THRESHOLD):
+                if(listInput[0] >= listInput[1] and listInput[0] >= listInput[2]):
                     car.orientation -= 5
 
-                if(listInput[1] >= THRESHOLD):
+                if(listInput[1] >= listInput[0] and listInput[1] >= listInput[2]):
                     car.orientation += 5
                 #########
 
                 if car.x != car.lastX or car.y != car.lastY:
                     tokenStop = False
             
-            if tokenStop:
-                break
+        if tokenStop and not PAUSE_MODE:
+            break
+        if not PAUSE_MODE:
             timeRace += 1
-            pygame.display.update()
-            clock.tick(30)
-        # temp_data = ga.evolve(cars)
-
+        pygame.display.update()
+        clock.tick(30)
+    # temp_data = ga.evolve(cars)
 
     bestDist = 0
     for car in cars :
         bestDist = max(bestDist, car.totalDistance)
         car.reinitialization()
-
+    currentBest = bestDist
+    bests.append(bestDist)
     t = time.time()-timeGen
     if t != 0 :
         print("Time gen: " + str(round(t,1)) + "s / " + str(round(timeRace / t,1)) + " fps; bestDist: " + str(bestDist))
+    
+    # graphs
+    X = [x for x in range(gen)]
+    ax.plot(bests, label="Best Fitness")
+    ax.grid()
+    canvas.draw()
+    renderer = canvas.get_renderer()
+    raw_data = renderer.tostring_rgb()
+    size = canvas.get_width_height()
+    surface_graph = pygame.image.fromstring(raw_data, size, "RGB")
+    gameDisplay.blit(surface_graph,(850, 10))
+
     gen += 1
 
 print(points)
