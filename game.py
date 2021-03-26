@@ -25,6 +25,7 @@ myfont = pygame.font.SysFont('Arial', 20)
 clock = pygame.time.Clock()
 
 carImg = pygame.image.load("imgs/car.png").convert_alpha()
+carImgBlue = pygame.image.load("imgs/carBlue.png").convert_alpha()
 
 cars = []
 for i in range(NB_CAR):
@@ -47,7 +48,7 @@ interior = [(303, 100), (345, 98), (392, 96), (442, 96), (479, 100), (514, 106),
 pygame.draw.lines(gameDisplay, (255,255,255), False, interior)
 
 # Graphs
-graph_bests = plt.figure(figsize=[3, 3])
+graph_bests = plt.figure(figsize=[4, 3])
 ax = graph_bests.add_subplot(111)
 bests = []
 means = []
@@ -58,6 +59,7 @@ ax.set_title("Fitness vs generations")
 canvas = agg.FigureCanvasAgg(graph_bests)
 
 currentBest = 0
+selection = None
 nbVisibleCars = NB_CAR
 gen = 0
 while gen < NB_GENERATION and not finished :
@@ -89,8 +91,15 @@ while gen < NB_GENERATION and not finished :
                     PAUSE_MODE = not PAUSE_MODE
 
             if(event.type == pygame.MOUSEBUTTONDOWN):
-                points.append(event.pos)
-                drawing = True
+                for car in cars :
+                    if event.pos[0] < car.x + 5 and event.pos[0] > car.x - 5 and event.pos[1] < car.y + 5 and event.pos[1] > car.y - 5 :
+                        print("clicked on car {}".format(car.id))
+                        if selection is not None : selection.selected = False
+                        car.selected = True
+                        selection = car
+                # Below for debugging
+                #points.append(event.pos)
+                #drawing = True
         
         ######## Testing intersection by mouse (needs VIEW_MODE = False)
         if drawing and len(points) > 1:
@@ -149,7 +158,8 @@ while gen < NB_GENERATION and not finished :
 
             ######## Drawing  and views calculations
             if VIEW_MODE and car.visible :
-                car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
+                if not car.selected : car.orientedCarImg = pygame.transform.rotate(carImg, -car.orientation)
+                else : car.orientedCarImg = pygame.transform.rotate(carImgBlue, -car.orientation)
                 new_rect = car.orientedCarImg.get_rect(center = (car.x,car.y))
 
                 lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
