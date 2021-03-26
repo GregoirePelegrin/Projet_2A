@@ -17,6 +17,7 @@ class Car():
         self.lastX = 0
         self.lastY = 0
         self.totalDistance = 0
+        self.totalDistanceLast = 0
         self.nn = lnn.NeuralNetwork()
         self.orientedCarImg = None
         Car.counter += 1
@@ -27,10 +28,11 @@ class Car():
         self.alive = True
         self.visible = True
         self.acceleration = 0
-        self.orientation = 80
+        self.orientation = 90
         self.x = 350
-        self.y = 90
+        self.y = 80
         self.nn.fitness = 0
+        self.totalDistanceLast = self.totalDistance
         self.totalDistance = 0
 
     def copy(self):
