@@ -49,9 +49,13 @@ pygame.draw.lines(gameDisplay, (255,255,255), False, interior)
 # Graphs
 graph_bests = plt.figure(figsize=[3, 3])
 ax = graph_bests.add_subplot(111)
+bests = []
+means = []
+ax.plot(bests, "-b", label="Bests")
+ax.plot(means, ":r", label="Means")
+ax.legend()
 ax.set_title("Fitness vs generations")
 canvas = agg.FigureCanvasAgg(graph_bests)
-bests = []
 
 currentBest = 0
 nbVisibleCars = NB_CAR
@@ -246,19 +250,21 @@ while gen < NB_GENERATION and not finished :
     # temp_data = ga.evolve(cars)
 
     bestDist = 0
+    sumTotal = 0
     for car in cars :
+        sumTotal += car.totalDistance
         bestDist = max(bestDist, car.totalDistance)
         car.reinitialization()
     currentBest = bestDist
     bests.append(bestDist)
+    means.append(sumTotal/len(cars))
     t = time.time()-timeGen
     if t != 0 :
         print("Time gen: " + str(round(t,1)) + "s / " + str(round(timeRace / t,1)) + " fps; bestDist: " + str(bestDist))
     
     # graphs
-    X = [x for x in range(gen)]
-    ax.plot(bests, label="Best Fitness")
-    ax.grid()
+    ax.plot(bests, "-b", label="Bests")
+    ax.plot(means, ":r", label="Means")
     canvas.draw()
     renderer = canvas.get_renderer()
     raw_data = renderer.tostring_rgb()
