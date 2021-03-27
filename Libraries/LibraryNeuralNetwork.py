@@ -4,7 +4,7 @@ import math
 import numpy as np
 
 # Constants
-NEURAL_NETWORK_SIZE = [3, 10, 10, 2]
+NEURAL_NETWORK_SIZE = [1, 2]
 
 # Activation functions
 def identity(x):
@@ -105,9 +105,9 @@ class NeuralNetwork:
             self.populate()
         NeuralNetwork.objectCounter += 1
     def __str__(self):
-        return "NeuralNetwork(id={})".format(self.id)
+        return "NeuralNetwork(id={}, fitness={})".format(self.id, self.fitness)
     def __repr__(self):
-        temp = "NeuralNetwork(id={},\n\t".format(self.id)
+        temp = "NeuralNetwork(id={}, fitness={},\n\t".format(self.id, self.fitness)
         for l in self.layers:
             temp += repr(l) + ",\n\t"
         temp += ")"
