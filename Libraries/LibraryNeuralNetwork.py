@@ -1,4 +1,4 @@
-# External libraries import
+# Libraries import
 from random import uniform
 import math
 import numpy as np
@@ -99,6 +99,9 @@ class NeuralNetwork:
         self.fitness = -10
         self.id = NeuralNetwork.objectCounter
         self.layers = []
+        self.nbrWeights = 0
+        for i in range(1, len(NEURAL_NETWORK_SIZE)):
+            self.nbrWeights += NEURAL_NETWORK_SIZE[i-1] * NEURAL_NETWORK_SIZE[i]
         if neural != None:
             self.copy(neural)
         else:
