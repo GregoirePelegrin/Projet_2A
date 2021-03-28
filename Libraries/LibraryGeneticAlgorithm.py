@@ -20,15 +20,63 @@ class GeneticAlgorithm:
         self.currentSorted.clear()
         self.nextGeneration.clear()
         self.sort(currGen)
+        score = []
+        for nn in self.currentSorted:
+            score.append(nn.fitness)
         self.variations()
-        # self.mutate(self.crossover(self.selection()))
+        self.mutate(self.crossover(self.selection()))
         self.populate()
-    def sort(self, currGen):
-        # Sort the current gen by descending fitness
-        self.currentSorted = sorted(currGen, key=lambda nn:nn.fitness, reverse=True)
+        return score
+
+    def crossover(self, selected):
+        crossed = []
+        if len(selected)%2 != 0:
+            r = randint(0, len(selected)-1)
+            crossed.append(lnn.NeuralNetwork(neural=selected[r]))
+            del selected[r]
+        while len(selected) > 0:
+            indPar1 = randint(0, len(selected)-1)
+            indPar2 = randint(0, len(selected)-1)
+            while indPar1 == indPar2:
+                indPar2 = randint(0, len(selected)-1)
+            p1 = lnn.NeuralNetwork(neural=selected[indPar1])
+            p2 = lnn.NeuralNetwork(neural=selected[indPar2])
+            if randint(0, 100) < self.PROBABILITY_CROSSOVER:
+                tempIndLay = randint(0, len(p1.layers)-1)
+                tempLay = lnn.Layer(layer=p1.layers[tempIndLay])
+                p1.layers[tempIndLay] = lnn.Layer(layer=p2.layers[tempIndLay])
+                p2.layers[tempIndLay] = tempLay
+            crossed.append(p1)
+            crossed.append(p2)
+            del selected[max(indPar1, indPar2)]
+            del selected[min(indPar1, indPar2)]
+        return crossed
+    def mutate(self, crossed):
+        for nn in crossed:
+            if randint(0, 100) < self.PROBABILITY_MUTATION:
+                tempLay = randint(1, len(nn.layers)-1)
+                tempNeu = randint(0, len(nn.layers[tempLay].neurons)-1)
+                tempWei = randint(0, len(nn.layers[tempLay].neurons[tempNeu].weights)-1)
+                nn.layers[tempLay].neurons[tempNeu].weights[tempWei] = uniform(-1, 1)
+            self.nextGeneration.append(nn)
     def populate(self):
         for i in range(self.NUMBER_INDIVIDUALS - len(self.nextGeneration)):
             self.nextGeneration.append(lnn.NeuralNetwork())
+    def sort(self, currGen):
+        # Sort the current gen by descending fitness
+        self.currentSorted = sorted(currGen, key=lambda nn:nn.fitness, reverse=True)
+    def selection(self):
+        selected = []
+        for nn in self.currentSorted[1:int(self.NUMBER_INDIVIDUALS/2)]:
+            selected.append(lnn.NeuralNetwork(neural=nn))
+        temp = []
+        for i in range(int(self.NUMBER_INDIVIDUALS/10)):
+            r = randint(int(self.NUMBER_INDIVIDUALS/2), len(self.currentSorted)-1)
+            while r in temp:
+                r = randint(int(self.NUMBER_INDIVIDUALS/2), len(self.currentSorted)-1)
+            temp.append(r)
+            selected.append(lnn.NeuralNetwork(neural=self.currentSorted[r]))
+        return selected
     def variations(self):
         self.nextGeneration.append(self.currentSorted[0])
         for i in range(int(15*self.NUMBER_INDIVIDUALS/40)):
