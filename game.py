@@ -58,6 +58,12 @@ ax.legend()
 ax.set_title("Fitness vs generations")
 canvas = agg.FigureCanvasAgg(graph_bests)
 
+# NN area
+X_SIZE = 400
+Y_SIZE = 250
+TOP_LEFT_X = 880
+TOP_LEFT_Y = 330
+
 currentBest = 0
 selection = None
 nbVisibleCars = NB_CAR
@@ -93,7 +99,7 @@ while gen < NB_GENERATION and not finished :
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 for car in cars :
                     if event.pos[0] < car.x + 5 and event.pos[0] > car.x - 5 and event.pos[1] < car.y + 5 and event.pos[1] > car.y - 5 :
-                        print("clicked on car {}".format(car.id))
+                        # print("clicked on car {}".format(car.id))
                         if selection is not None : selection.selected = False
                         car.selected = True
                         selection = car
@@ -140,17 +146,28 @@ while gen < NB_GENERATION and not finished :
                 car.visible = True
 
         gameDisplay.fill((0,0,0), (0,0,800,600))
+        gameDisplay.fill((0,0,0), (TOP_LEFT_X-10,TOP_LEFT_Y-10,TOP_LEFT_X+X_SIZE,TOP_LEFT_Y+Y_SIZE))
         pygame.draw.lines(gameDisplay, (255,255,255), False, interior)
         pygame.draw.lines(gameDisplay, (255,255,255), False, exterior)
-        ######## Show numbers
+
+        ######## Show numbers / modes
         textsurface = []
-        textsurface.append(myfont.render("Cars : {} ({} shown)".format(NB_CAR, nbVisibleCars), False, (255, 255, 255)))
+        textsurface.append(myfont.render("[B] Cars : {} ({} shown)".format(NB_CAR, nbVisibleCars), False, (255, 255, 255)))
         textsurface.append(myfont.render("Gen : {}".format(gen), False, (255, 255, 255)))
         textsurface.append(myfont.render("Best : {}".format(currentBest), False, (255, 255, 255)))
+        if not VIEW_MODE :
+            textsurface.append(myfont.render("[V] Viewing off", False, (255, 255, 255)))
+        else :
+            textsurface.append(myfont.render("[V] Viewing on", False, (255, 255, 255)))
         if PAUSE_MODE :
-            textsurface.append(myfont.render("== Game paused ==", False, (255, 255, 255)))
+            textsurface.append(myfont.render("[SPACE] Game paused", False, (255, 255, 255)))
+        else :
+            textsurface.append(myfont.render("", False, (255, 255, 255)))
         for line in range(len(textsurface)) :
-            gameDisplay.blit(textsurface[line],(0,line*20))
+            if line == len(textsurface)-1 : # pause :
+                gameDisplay.blit(textsurface[line],(600, 20))
+            else :
+                gameDisplay.blit(textsurface[line],(0,line*20))
             
         for car in cars :
             if(not car.alive):
@@ -164,6 +181,35 @@ while gen < NB_GENERATION and not finished :
 
                 lineSurface = pygame.Surface((800,600), pygame.SRCALPHA, 32)
                 lineSurface = lineSurface.convert_alpha()
+            
+            
+            ######## Show selected car's attributes
+            if car.selected :
+                i = 0
+                nb_layers = len(car.nn.layers)
+                for layer in car.nn.layers :
+                    j = 0
+                    nb_neurons = len(layer.neurons)
+                    for neuron in layer.neurons :
+                        k = 0
+                        nb_weights = len(neuron.weights)
+                        for weight in neuron.weights :
+                            pygame.draw.line(gameDisplay, (255,255,255),(TOP_LEFT_X+(i-1)*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_weights)/2+k*(Y_SIZE/nb_weights)),
+                                                                        (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)))
+                            k += 1
+                        if i > 0 : # if not first layer
+                            if neuron.value < THRESHOLD :
+                                pygame.draw.circle(gameDisplay, (255,255,255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+                            else :
+                                pygame.draw.circle(gameDisplay, (255,0,0), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+                        else : # if first layer
+                            if neuron.value >= 50 :
+                                pygame.draw.circle(gameDisplay, (255,255,255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+                            else :
+                                pygame.draw.circle(gameDisplay, (255,0,0), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+                        j+=1
+                    i+=1
+
 
             VIEW_MODE and car.visible and gameDisplay.blit(car.orientedCarImg, new_rect.topleft)
 
@@ -238,7 +284,7 @@ while gen < NB_GENERATION and not finished :
                 car.totalDistance += (dx1**2+dy1**2)**0.5
 
                 ######## Neural network inputs
-                listInput = car.nn.evaluate([ dist1, dist2, dist3])
+                listInput = car.nn.evaluate([dist2, dist1, dist3])
                 #listInput = [random.uniform(0, 1),random.uniform(0, 1)]
                 
                 if(listInput[0] >= listInput[1] and listInput[0] >= listInput[2]):
@@ -265,6 +311,7 @@ while gen < NB_GENERATION and not finished :
         sumTotal += car.totalDistance
         bestDist = max(bestDist, car.totalDistance)
         car.reinitialization()
+
     currentBest = bestDist
     bests.append(bestDist)
     means.append(sumTotal/len(cars))
