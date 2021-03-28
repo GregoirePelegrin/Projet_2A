@@ -39,5 +39,12 @@ class Car():
     def copy(self):
         new_car = Car()
         new_car.nn = self.nn
+        new_car.speed = self.speed
+        new_car.x = self.x
+        new_car.y = self.y
+        new_car.orientation = self.orientation
+        new_car.selected = self.selected
         new_car.orientedCarImg = self.orientedCarImg
+        new_car.totalDistance = self.totalDistance
+        new_car.totalDistanceLast = self.totalDistanceLast
         return new_car
