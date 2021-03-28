@@ -168,6 +168,11 @@ while gen < NB_GENERATION and not finished :
                 gameDisplay.blit(textsurface[line],(600, 20))
             else :
                 gameDisplay.blit(textsurface[line],(0,line*20))
+
+        # for car in range(len(cars)):
+        #     if cars[car].selected :
+        #         cars.append(cars[car].copy())
+        #         del cars[car]
             
         for car in cars :
             if(not car.alive):
@@ -183,7 +188,7 @@ while gen < NB_GENERATION and not finished :
                 lineSurface = lineSurface.convert_alpha()
             
             
-            ######## Show selected car's attributes
+            ######## Show selected car's attributes / NN
             if car.selected :
                 i = 0
                 nb_layers = len(car.nn.layers)
@@ -287,10 +292,10 @@ while gen < NB_GENERATION and not finished :
                 listInput = car.nn.evaluate([dist2, dist1, dist3])
                 #listInput = [random.uniform(0, 1),random.uniform(0, 1)]
                 
-                if(listInput[0] >= listInput[1] and listInput[0] >= listInput[2]):
+                if(listInput[0] >= THRESHOLD):
                     car.orientation -= 5
 
-                if(listInput[1] >= listInput[0] and listInput[1] >= listInput[2]):
+                if(listInput[1] >= THRESHOLD):
                     car.orientation += 5
                 #########
 
