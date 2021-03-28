@@ -28,7 +28,6 @@ class Car():
     def reinitialization(self):
         self.alive = True
         self.visible = True
-        self.selected = False
         self.acceleration = 0
         self.orientation = 90
         self.x = 350
