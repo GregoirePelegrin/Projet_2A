@@ -3,8 +3,6 @@ from Libraries import LibraryNeuralNetwork as lnn
 from random import randint
 from random import uniform
 
-# Constants
-
 # Class
 class GeneticAlgorithm:
     def __init__(self, ni, pc=10, pm=10):
