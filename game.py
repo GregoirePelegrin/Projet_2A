@@ -13,9 +13,9 @@ import Libraries.LibraryGame as lg
 import Libraries.collisionDetection as cd
 
 THRESHOLD = 0.55
-NB_CAR = 400
+NB_CAR = 200
 NB_BEST_CAR = 10
-NB_GENERATION = 50
+NB_GENERATION = 500
 TIME_RACE = 300
 
 #pygame.init() # Long to charge
