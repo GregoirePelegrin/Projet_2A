@@ -205,8 +205,16 @@ while gen < NB_GENERATION and not finished :
                             pygame.draw.line(gameDisplay, (255,255,255),(TOP_LEFT_X+(i-1)*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_weights)/2+k*(Y_SIZE/nb_weights)),
                                                                         (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)))
                             k += 1
-                        if i > 0 : # if not first layer
+
+                        if i == nb_layers-1: # if last layer
+                            if neuron.value > THRESHOLD :
+                                pygame.draw.circle(gameDisplay, (0,255,0), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+                            else :
+                                pygame.draw.circle(gameDisplay, (255,255-neuron.value*255,255-neuron.value*255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+
+                        elif i > 0 : # if not first layer
                             pygame.draw.circle(gameDisplay, (255,255-neuron.value*255,255-neuron.value*255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+
 
                         else : # if first layer
                             pygame.draw.circle(gameDisplay, (255,neuron.value*255/50,neuron.value*255/50), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
@@ -300,15 +308,15 @@ while gen < NB_GENERATION and not finished :
 
                 if car.x != car.lastX or car.y != car.lastY:
                     tokenStop = False
-                
-            car.nn.fitness = car.fitness()
             
+            car.nn.fitness = car.fitness()
+
         if tokenStop and not PAUSE_MODE:
             break
         if not PAUSE_MODE:
             timeRace += 1
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(300)
     temp_data = ga.evolve([c.nn for c in cars])
     for car,nn in zip(cars, ga.nextGeneration):
         car.nn = nn
