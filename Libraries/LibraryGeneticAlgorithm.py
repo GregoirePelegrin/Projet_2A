@@ -85,6 +85,6 @@ class GeneticAlgorithm:
                 tempLay = randint(1, len(tempNN.layers)-1)
                 tempNeu = randint(0, len(tempNN.layers[tempLay].neurons)-1)
                 tempWei = randint(0, len(tempNN.layers[tempLay].neurons[tempNeu].weights)-1)
-                tempNN.layers[tempLay].neurons[tempNeu].weights[tempWei] += uniform(-0.1, 0.1)
+                tempNN.layers[tempLay].neurons[tempNeu].weights[tempWei] += uniform(-1, 1)
             self.nextGeneration.append(tempNN)
     
