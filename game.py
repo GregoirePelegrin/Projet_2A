@@ -148,8 +148,24 @@ while gen < NB_GENERATION and not finished :
             for car in cars :
                 car.visible = True
 
+        ######## NN inputs & outputs
         gameDisplay.fill((0,0,0), (0,0,800,600))
         gameDisplay.fill((0,0,0), (TOP_LEFT_X-10,TOP_LEFT_Y-10,TOP_LEFT_X+X_SIZE,TOP_LEFT_Y+Y_SIZE))
+        textsurface = []
+        textsurface.append(myfont.render("Speed", False, (255, 255, 255)))
+        textsurface.append(myfont.render("Left", False, (255, 255, 255)))
+        textsurface.append(myfont.render("Straight", False, (255, 255, 255)))
+        textsurface.append(myfont.render("Right", False, (255, 255, 255)))
+        for line in range(len(textsurface)) :
+            gameDisplay.blit(textsurface[line],(TOP_LEFT_X-70, TOP_LEFT_Y+20+line*60))
+        textsurface = []
+        textsurface.append(myfont.render("Go left", False, (255, 255, 255)))
+        textsurface.append(myfont.render("Accelerate", False, (255, 255, 255)))
+        textsurface.append(myfont.render("Slow down", False, (255, 255, 255)))
+        textsurface.append(myfont.render("Go right", False, (255, 255, 255)))
+        for line in range(len(textsurface)) :
+            gameDisplay.blit(textsurface[line],(TOP_LEFT_X+330, TOP_LEFT_Y+20+line*60))
+
         pygame.draw.lines(gameDisplay, (255,255,255), False, interior)
         pygame.draw.lines(gameDisplay, (255,255,255), False, exterior)
 
@@ -205,7 +221,7 @@ while gen < NB_GENERATION and not finished :
                             pygame.draw.line(gameDisplay, (255,255,255),(TOP_LEFT_X+(i-1)*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_weights)/2+k*(Y_SIZE/nb_weights)),
                                                                         (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)))
                             k += 1
-
+                        print(neuron.value)
                         if i == nb_layers-1: # if last layer
                             if neuron.value > THRESHOLD :
                                 pygame.draw.circle(gameDisplay, (0,255,0), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
@@ -217,7 +233,7 @@ while gen < NB_GENERATION and not finished :
 
 
                         else : # if first layer
-                            pygame.draw.circle(gameDisplay, (255,neuron.value*255/50,neuron.value*255/50), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+                            pygame.draw.circle(gameDisplay, (255,neuron.value*255,neuron.value*255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
 
                         j+=1
                     i+=1
