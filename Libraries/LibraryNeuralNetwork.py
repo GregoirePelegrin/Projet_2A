@@ -1,4 +1,4 @@
-# External libraries import
+# Libraries import
 from random import uniform
 import math
 import numpy as np
@@ -99,15 +99,18 @@ class NeuralNetwork:
         self.fitness = -10
         self.id = NeuralNetwork.objectCounter
         self.layers = []
+        self.nbrWeights = 0
+        for i in range(1, len(NEURAL_NETWORK_SIZE)):
+            self.nbrWeights += NEURAL_NETWORK_SIZE[i-1] * NEURAL_NETWORK_SIZE[i]
         if neural != None:
             self.copy(neural)
         else:
             self.populate()
         NeuralNetwork.objectCounter += 1
     def __str__(self):
-        return "NeuralNetwork(id={})".format(self.id)
+        return "NeuralNetwork(id={}, fitness={})".format(self.id, self.fitness)
     def __repr__(self):
-        temp = "NeuralNetwork(id={},\n\t".format(self.id)
+        temp = "NeuralNetwork(id={}, fitness={},\n\t".format(self.id, self.fitness)
         for l in self.layers:
             temp += repr(l) + ",\n\t"
         temp += ")"
