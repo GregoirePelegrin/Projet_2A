@@ -203,15 +203,11 @@ while gen < NB_GENERATION and not finished :
                                                                         (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)))
                             k += 1
                         if i > 0 : # if not first layer
-                            if neuron.value < THRESHOLD :
-                                pygame.draw.circle(gameDisplay, (255,255,255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
-                            else :
-                                pygame.draw.circle(gameDisplay, (255,0,0), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+                            pygame.draw.circle(gameDisplay, (255,255-neuron.value*255,255-neuron.value*255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+
                         else : # if first layer
-                            if neuron.value >= 50 :
-                                pygame.draw.circle(gameDisplay, (255,255,255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
-                            else :
-                                pygame.draw.circle(gameDisplay, (255,0,0), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+                            pygame.draw.circle(gameDisplay, (255,neuron.value*255/50,neuron.value*255/50), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
+
                         j+=1
                     i+=1
 
@@ -295,7 +291,7 @@ while gen < NB_GENERATION and not finished :
                 if(listInput[0] >= THRESHOLD):
                     car.orientation -= 5
 
-                if(listInput[1] >= THRESHOLD):
+                if(listInput[2] >= THRESHOLD):
                     car.orientation += 5
                 #########
 
