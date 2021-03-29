@@ -10,7 +10,7 @@ class Car():
         self.alive = True
         self.visible = True
         self.selected = False
-        self.speed = 10
+        self.speed = 5
         self.orientation = 90
         self.x = 350
         self.y = 80

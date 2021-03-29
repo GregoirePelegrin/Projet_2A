@@ -296,13 +296,24 @@ while gen < NB_GENERATION and not finished :
                 car.totalDistance += (dx1**2+dy1**2)**0.5
 
                 ######## Neural network inputs
-                listInput = car.nn.evaluate([dist2, dist1, dist3])
+                speed_normalized = (car.speed +5) / 15
+                dist1_normalized = dist1 / 50
+                dist2_normalized = dist2 / 50
+                dist3_normalized = dist3 / 50
+                listInput = car.nn.evaluate([speed_normalized, dist2_normalized, dist1_normalized, dist3_normalized])
                 #listInput = [random.uniform(0, 1),random.uniform(0, 1)]
                 
                 if(listInput[0] >= THRESHOLD):
                     car.orientation -= 5
 
+                if(listInput[1] >= THRESHOLD):
+                    if car.speed >= 10 :
+                        car.speed += 1
                 if(listInput[2] >= THRESHOLD):
+                    if car.speed <= -5 :
+                        car.speed -= 0.5
+
+                if(listInput[3] >= THRESHOLD):
                     car.orientation += 5
                 #########
 
