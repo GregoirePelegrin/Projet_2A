@@ -78,13 +78,13 @@ class GeneticAlgorithm:
             selected.append(lnn.NeuralNetwork(neural=self.currentSorted[r]))
         return selected
     def variations(self):
-        self.nextGeneration.append(self.currentSorted[0])
+        self.nextGeneration.append(lnn.NeuralNetwork(neural=self.currentSorted[0]))
         for i in range(int(15*self.NUMBER_INDIVIDUALS/40)):
             tempNN = lnn.NeuralNetwork(neural=self.currentSorted[0])
             for j in range(randint(max(5, int(tempNN.nbrWeights/10)), max(15, int(tempNN.nbrWeights/5)))):
                 tempLay = randint(1, len(tempNN.layers)-1)
                 tempNeu = randint(0, len(tempNN.layers[tempLay].neurons)-1)
                 tempWei = randint(0, len(tempNN.layers[tempLay].neurons[tempNeu].weights)-1)
-                tempNN.layers[tempLay].neurons[tempNeu].weights[tempWei] += uniform(-0.05, 0.05)
+                tempNN.layers[tempLay].neurons[tempNeu].weights[tempWei] += uniform(-0.1, 0.1)
             self.nextGeneration.append(tempNN)
     

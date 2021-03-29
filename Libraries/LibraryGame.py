@@ -1,6 +1,5 @@
 import Libraries.LibraryNeuralNetwork as lnn
 
-
 class Car():
     counter = 0
     def __init__(self, _id=None):
@@ -48,3 +47,6 @@ class Car():
         new_car.totalDistance = self.totalDistance
         new_car.totalDistanceLast = self.totalDistanceLast
         return new_car
+
+    def fitness(self):
+        return self.totalDistance

@@ -8,11 +8,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_agg as agg
 
+import Libraries.LibraryGeneticAlgorithm as lga
 import Libraries.LibraryGame as lg
 import Libraries.collisionDetection as cd
 
 THRESHOLD = 0.55
-NB_CAR = 100
+NB_CAR = 400
 NB_BEST_CAR = 10
 NB_GENERATION = 50
 TIME_RACE = 300
@@ -26,6 +27,8 @@ clock = pygame.time.Clock()
 
 carImg = pygame.image.load("imgs/car.png").convert_alpha()
 carImgBlue = pygame.image.load("imgs/carBlue.png").convert_alpha()
+
+ga = lga.GeneticAlgorithm(ni=NB_CAR)
 
 cars = []
 for i in range(NB_CAR):
@@ -297,6 +300,8 @@ while gen < NB_GENERATION and not finished :
 
                 if car.x != car.lastX or car.y != car.lastY:
                     tokenStop = False
+                
+            car.nn.fitness = car.fitness()
             
         if tokenStop and not PAUSE_MODE:
             break
@@ -304,7 +309,11 @@ while gen < NB_GENERATION and not finished :
             timeRace += 1
         pygame.display.update()
         clock.tick(30)
-    # temp_data = ga.evolve(cars)
+    temp_data = ga.evolve([c.nn for c in cars])
+    for car,nn in zip(cars, ga.nextGeneration):
+        car.nn = nn
+        car.selected = False
+    cars[0].selected = True
 
     bestDist = 0
     sumTotal = 0
