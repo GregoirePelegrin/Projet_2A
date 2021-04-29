@@ -18,6 +18,7 @@ class Car():
         self.lastY = 0
         self.totalDistance = 0
         self.totalDistanceLast = 0
+        self.nextCheckpointId = 0
         self.nn = lnn.NeuralNetwork()
         self.orientedCarImg = None
         Car.counter += 1
@@ -34,6 +35,7 @@ class Car():
         self.nn.fitness = 0
         self.totalDistanceLast = self.totalDistance
         self.totalDistance = 0
+        self.nextCheckpointId = 0
 
     def copy(self):
         new_car = Car()
@@ -46,6 +48,7 @@ class Car():
         new_car.orientedCarImg = self.orientedCarImg
         new_car.totalDistance = self.totalDistance
         new_car.totalDistanceLast = self.totalDistanceLast
+        self.nextCheckpointId = self.nextCheckpointId
         return new_car
 
     def fitness(self):
