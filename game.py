@@ -235,6 +235,7 @@ while gen < NB_GENERATION and not finished :
                                 pygame.draw.circle(gameDisplay, (255,min(1,neuron.value)*255,min(1,neuron.value)*255), (TOP_LEFT_X+i*(X_SIZE/nb_layers), TOP_LEFT_Y+(Y_SIZE/nb_neurons)/2+j*(Y_SIZE/nb_neurons)), 7)
                         except :
                             print(i ,neuron.value)
+
                         j+=1
                     i+=1
                 gameDisplay.fill((0,0,0), (TOP_LEFT_X+40,TOP_LEFT_Y-20,300,20))
@@ -345,6 +346,7 @@ while gen < NB_GENERATION and not finished :
                 if(listInput[2] >= THRESHOLD):
                     if car.speed >= 5 :
                         car.speed -= 0.5
+
 
                 if(listInput[3] >= THRESHOLD):
                     car.orientation += 5
