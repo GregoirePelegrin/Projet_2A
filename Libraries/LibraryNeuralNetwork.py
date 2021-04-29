@@ -39,7 +39,7 @@ class Neuron:
         temp = ["Neuron(id={}, value={}".format(self.id, self.value), "\tbias={}".format(self.bias), "\tweights={})".format(self.weights)]
         return temp
     def evaluate(self, inputs):
-        self.value = sigmoid(np.sum(self.weights * inputs) + self.bias)
+        self.value = relu(np.sum(self.weights * inputs) + self.bias)
     def populate(self, size):
         if size == 0:
             self.bias = None
