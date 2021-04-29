@@ -344,7 +344,7 @@ while gen < NB_GENERATION and not finished :
                     if car.speed <= 10 :
                         car.speed += 1
                 if(listInput[2] >= THRESHOLD):
-                    if car.speed >= 5 :
+                    if car.speed >= -5 :
                         car.speed -= 0.5
 
 
