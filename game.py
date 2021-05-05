@@ -16,7 +16,7 @@ THRESHOLD = 0.5
 NB_CAR = 200
 NB_BEST_CAR = 10
 NB_GENERATION = 500
-TIME_RACE = 300
+TIME_RACE = 100
 
 #pygame.init() # Long to charge
 pygame.font.init()
@@ -69,6 +69,10 @@ X_SIZE = 400
 Y_SIZE = 250
 TOP_LEFT_X = 880
 TOP_LEFT_Y = 330
+
+# Buttons
+POS_BUTTON_MINUS = (255, -5)
+POS_BUTTON_PLUS = (325, -5)
 
 currentBest = 0
 selection = None
@@ -163,6 +167,19 @@ while gen < NB_GENERATION and not finished :
 
         pygame.draw.lines(gameDisplay, (255,255,255), False, interior)
         pygame.draw.lines(gameDisplay, (255,255,255), False, exterior)
+
+
+        ######## Buttons + -
+        button = pygame.Rect(250, 0, 20, 20)
+        pygame.draw.rect(gameDisplay, (100, 100, 100), button)
+        text = myfont.render('-' , True , (255, 255, 255))
+        gameDisplay.blit(text,POS_BUTTON_MINUS) # (255, -5)
+        text = myfont.render(str(TIME_RACE) , True , (255, 255, 255))
+        gameDisplay.blit(text,(280, 0))
+        button = pygame.Rect(320, 0, 20, 20)
+        pygame.draw.rect(gameDisplay, (100, 100, 100), button)
+        text = myfont.render('+' , True , (255, 255, 255))
+        gameDisplay.blit(text,POS_BUTTON_PLUS) # (325, -5)
 
         ######## Draw Checkpoints
         for c in checkpoints :
@@ -304,6 +321,7 @@ while gen < NB_GENERATION and not finished :
                     dist = math.sqrt( (car.x-dist[0])**2 + (car.y-dist[1])**2 )
                     if dist < 11 and p == car.nextCheckpointId :
                         car.nextCheckpointId += 1
+                        car.totalDistanceAfterCheckpoint = 0
 
             if dist1 < 50 :
                 VIEW_MODE and car.visible and pygame.draw.line(lineSurface, (255,0,0),(car.x,car.y),(car.x+dx1*50,car.y+dy1*50))
@@ -327,10 +345,12 @@ while gen < NB_GENERATION and not finished :
                 car.y += dy1*car.speed
                 #car.totalDistance += (dx1**2+dy1**2+car.speed**2)**0.5
                 #car.totalDistance = round(car.totalDistance, 1)
-                car.totalDistance = car.nextCheckpointId - 1
+                car.totalDistanceAfterCheckpoint += (dx1**2+dy1**2)**0.5
+                car.totalDistanceAfterCheckpoint = round(car.totalDistanceAfterCheckpoint, 1)
+                car.totalDistance = car.nextCheckpointId * 100 + car.totalDistanceAfterCheckpoint
 
                 ######## Neural network inputs
-                speed_normalized = car.speed / 11   
+                speed_normalized = (car.speed +5) / 15  
                 dist1_normalized = dist1 / 50
                 dist2_normalized = dist2 / 50
                 dist3_normalized = dist3 / 50
